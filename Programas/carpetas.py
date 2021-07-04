@@ -47,15 +47,15 @@ def obtener_docentes() -> None:
 
 def obtener_docente_y_alumnos() -> dict:
     # Recibe csv docentes-alumnos y genera dict docentes-alumnos (dya)
-    docentes = dict()
+    dya = dict()
 
     with open(RUTA_DYA, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
         next(csv_reader)
         for fila in csv_reader:
-            docentes[fila[DYA_DOCENTE_NOMBRE]] = fila[DYA_ALUMNO_NOMBRE]
+            dya[fila[DYA_DOCENTE_NOMBRE]] = fila[DYA_ALUMNO_NOMBRE]
     
-    return docentes
+    return dya
 
 
 def crear_carpetas_anidadas(alumnos: dict, docentes: dict, dya: dict) -> None:
@@ -65,10 +65,13 @@ def crear_carpetas_anidadas(alumnos: dict, docentes: dict, dya: dict) -> None:
     alumnos_nombres = list(alumnos.keys())
 
     # Creamos las carpetas aquí
+   
     for i in range(len(docentes_nombres)):
-        #os.mkdir(docentes_nombres[i])
-        #os.mkdir("(Sin docente asignado)")
-        pass
+        try:
+            os.mkdir(docentes_nombres[i])
+            os.mkdir("(Sin docente asignado)")
+        except FileExistsError:
+            pass
 
 
 def generar_carpetas_evaluacion(nombre_evaluacion: str="", entrega_alumnos: dict=(), docentes_csv: str="", dya_csv: str="") -> None:
@@ -77,7 +80,7 @@ def generar_carpetas_evaluacion(nombre_evaluacion: str="", entrega_alumnos: dict
     alumnos = obtener_alumnos()
     docentes = obtener_docentes()
     dya = obtener_docente_y_alumnos()
-    print(alumnos, docentes, dya) #debug
+    #print(alumnos, docentes, dya) #debug
     crear_carpetas_anidadas(alumnos, docentes, dya)
 
 
