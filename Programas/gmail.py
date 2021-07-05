@@ -71,8 +71,36 @@ Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmai
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
 
-servicio = obtener_servicio() #se obtienen las credenciales para poder autenticar con el servicio solicitado
+def almacenando_asuntos(id_mails:list, servicio:Resource):
 
-emails_recibidos = servicio.users().messages().list(userId='me').execute()#aca listamos todos los mails del usuario.
+    asuntos = [] #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
+    for i in id_mails:
+        lectura_mail = servicio.users().messages().get(userId='me', id = i).execute()
+        filtro = lectura_mail['payload']['headers'][19]['value']
+        asuntos.append(filtro)
 
-print(emails_recibidos)
+    print(asuntos)
+
+
+def obteniendo_ids_mails(servicio:Resource) -> list:
+
+    #PRE: No recibimos ningun parametro.
+    #POST: Retronamos en una lista los id's de los mails.
+    
+    id_mails = [] #Se guaradaran asi ['123345', 'dhgfgh34534543']
+    emails_recibidos = servicio.users().messages().list(userId='me', q='is:unread').execute() #falta colocar la query, veremos en base a que se obtienen.
+    obteniendo_ids = emails_recibidos['messages']
+    
+    for id in obteniendo_ids:
+        id_mails.append(id['id'])
+    
+    return id_mails
+
+
+def main():
+
+    servicio = obtener_servicio()
+    id_mails = obteniendo_ids_mails(servicio)
+    almacenando_asuntos(id_mails, servicio)
+
+main()
