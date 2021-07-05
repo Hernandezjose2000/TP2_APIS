@@ -65,5 +65,3 @@ def obtener_servicio() -> Resource:
     Creador de la conexion a la API Gmail
     """
     return build('gmail', 'v1', credentials=generar_credenciales())
-
-obtener_servicio()
