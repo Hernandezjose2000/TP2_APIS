@@ -2,8 +2,13 @@
 
 import archivos
 import carpetas
-import drive
+import drive     
 import gmail
+
+'''
+    Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
+    o el programa no va a funcar porque no los encuentra
+'''
 
 
 def ingresar_opcion_int(rango_opciones: int) -> int:
@@ -31,8 +36,8 @@ def descargar_archivo() -> None:
 def sincronizar() -> None:
     pass
 
-def generar_carpetas_evaluacion() -> None:
-    pass
+#def generar_carpetas_evaluacion() -> None:
+#    pass
 
 def actualizar_entregas_alumnos() -> None:
     pass
@@ -42,14 +47,17 @@ def menu() -> None:
     continuar_en_menu = True
 
     while continuar_en_menu:
-        print("GOOGLE DRIVE\n\n")
+        print("GOOGLE DRIVE - LOCAL\n")
         print("1 - Listar archivos de la carpeta actual")
         print("2 - Crear un archivo")
         print("3 - Subir un archivo")
         print("4 - Descargar un archivo")
-        print("5 - Sincronizar")
+        print("5 - Sincronizar\n\n")
+
+        print("SISTEMA DE EVALUACIONES\n")
         print("6 - Generar carpetas de una evaluación")
-        print("7 - Actualizar entregas de alumnos vía mail")
+        print("7 - Actualizar entregas de alumnos vía mail\n\n")
+
         print("8 - Salir\n")
 
         opcion = ingresar_opcion_int(8)
@@ -65,7 +73,7 @@ def menu() -> None:
         elif opcion == 5:
             sincronizar()
         elif opcion == 6:
-            generar_carpetas_evaluacion()
+            carpetas.organizar_evaluaciones()
         elif opcion == 7:
             actualizar_entregas_alumnos()
         elif opcion == 8:
@@ -73,7 +81,7 @@ def menu() -> None:
 
 
 def main() -> None:
-    # Irán más cosas en el main (supongo)
+    # ¡Próximamente, más funcionalidades!
     menu()
         
 

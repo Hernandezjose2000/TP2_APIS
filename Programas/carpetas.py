@@ -12,19 +12,26 @@ RUTA_DOCENTES = "docentes.csv"
 RUTA_DYA = "docente-alumnos.csv"
 
 
-def imprimir_diccionario_simple(diccionario: dict, forma: int = 1) -> None:
-    if forma == 1:
-        for elemento in diccionario:
-            print(f"{elemento}: {diccionario[elemento]}")
-    elif forma == 2:
-        for clave, valor in diccionario.items():
-            print(f"{clave}: {valor}")
-    
+def imprimir_diccionario_simple(diccionario: dict) -> None:
+    for elemento in diccionario:
+        print(f"{elemento}: {diccionario[elemento]}")
+
     print("\n\n")
 
 
-def obtener_evaluaciones(evaluaciones_csv: str) -> dict:
-    pass
+def obtener_evaluaciones(ruta_evaluaciones: str) -> dict:
+    # Recibe csv evaluaciones y genera dict evaluaciones
+    evaluaciones = dict()
+    evaluacion_nombre = 0
+    finalizado = 1
+
+    with open(ruta_evaluaciones, mode='r', encoding="UTF-8") as archivo_csv:
+        csv_reader = csv.reader(archivo_csv, delimiter= ';')
+        next(csv_reader)
+        for fila in csv_reader:
+            evaluaciones[fila[evaluacion_nombre]] = fila[finalizado]
+
+    return evaluaciones
 
 
 def obtener_alumnos(ruta_alumnos: str) -> dict:
@@ -85,36 +92,39 @@ def crear_carpetas_anidadas(evaluaciones: dict, alumnos: dict, docentes: dict, d
     docentes_nombres = list(docentes.keys())
     alumnos_nombres = list(alumnos.keys())
 
-    # Creamos las carpetas de los docentes
-    for i in range(len(docentes_nombres)):
-        try:
-            os.mkdir(docentes_nombres[i])
-        except FileExistsError:
-            pass
-    
-    # Creamos las subcarpetas de alumnos
-    # Si el docente no se encuentra en dya.csv, es porque no tiene un alumno asignado
-    for docente in docentes_nombres:
-        if docente in dya:
-            for alumno in dya[docente]:
-                try:
-                    os.makedirs(f'{docente}/{alumno}')
-                except FileExistsError:
-                    pass
-    
-    # Creamos las carpetas para los alumnos huérfanos (sin docentes)
-    alumnos_asignados_aux = list(dya.values())
-    alumnos_asignados = list()
-    for i in range(len(alumnos_asignados_aux)):
-        for j in range(len(alumnos_asignados_aux[i])):
-            alumnos_asignados.append(alumnos_asignados_aux[i][j])
+    # Creamos las carpetas para cada evaluación
+    for evaluacion in evaluaciones:
 
-    for alumno in alumnos_nombres:
-        if alumno not in alumnos_asignados:
+        # Creamos las carpetas de los docentes
+        for i in range(len(docentes_nombres)):
             try:
-                os.makedirs(f'(Sin docente asignado)/{alumno}')
+                os.makedirs(f'Evaluaciones/{evaluacion}/{docentes_nombres[i]}')
             except FileExistsError:
                 pass
+        
+        # Creamos las subcarpetas de alumnos
+        # Si el docente no se encuentra en dya.csv, es porque no tiene un alumno asignado
+        for docente in docentes_nombres:
+            if docente in dya:
+                for alumno in dya[docente]:
+                    try:
+                        os.makedirs(f'Evaluaciones/{evaluacion}/{docente}/{alumno}')
+                    except FileExistsError:
+                        pass
+        
+        # Creamos las carpetas para los alumnos huérfanos (sin docentes)
+        alumnos_asignados_aux = list(dya.values())
+        alumnos_asignados = list()
+        for i in range(len(alumnos_asignados_aux)):
+            for j in range(len(alumnos_asignados_aux[i])):
+                alumnos_asignados.append(alumnos_asignados_aux[i][j])
+
+        for alumno in alumnos_nombres:
+            if alumno not in alumnos_asignados:
+                try:
+                    os.makedirs(f'Evaluaciones/{evaluacion}/(Sin docente asignado)/{alumno}')
+                except FileExistsError:
+                    pass
 
 
 def colocar_evaluaciones(evaluaciones: str, entregas_alumnos: str):
