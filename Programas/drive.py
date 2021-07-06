@@ -83,7 +83,7 @@ archivos entre carpetas.
 Por ahora es pura prueba y error, empirismo puro!
 '''
 
-def subirArchivo(servicio): #Sube un archivo al drive sin meterlo en alguna carpeta
+def subir_archivo(servicio): #Sube un archivo al drive sin meterlo en alguna carpeta
     
     nombre_archivo = input('Ingrese el nombre del archivo junto con su extension (ej - imagengatito.png): ')
     ruta_archivo = input('repita el paso anterior: ') #Lo tengo que optimizar, funciona si metes 2 veces el nombre y extension.
@@ -97,7 +97,7 @@ def subirArchivo(servicio): #Sube un archivo al drive sin meterlo en alguna carp
     print('ID Archivo: %s' % archivo.get('id')) 
 
 
-def descargarArchivo (servicio): #aun no funciona correctamente. está copiado directamente de Google for Developers
+def descargar_archivo (servicio): #aun no funciona correctamente. está copiado directamente de Google for Developers
     
     nombre_archivo = input('Ingrese el nombre del archivo: ')
    
@@ -105,17 +105,29 @@ def descargarArchivo (servicio): #aun no funciona correctamente. está copiado d
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
     done = True
-    while not done:
+    while not done: #placeholder
      status, done = downloader.next_chunk()
 
      print ("Download %d%%.") % int(status.progress() * 100)
+
+
+def crear_carpeta(servicio): #funciona! Voy a ver de crear una carpeta y a su vez crear archivo en dicha carpeta
+    nombre = input('Ingrese nombre de la carpeta a crear: ')
+    carpeta_metadata = {
+    'name': nombre,
+    'mimeType': 'application/vnd.google-apps.folder'
+    }
+    file = servicio.files().create(body=carpeta_metadata, fields='id').execute()
+    print ('ID Carpeta: %s' % file.get('id'))
+
+
 
 
 
 
 def main():
     servicio = obtener_servicio()   
-    descargarArchivo(servicio)
+    crear_carpeta(servicio)
 
 
 main()
