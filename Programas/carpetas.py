@@ -1,90 +1,152 @@
 import csv
 import os
+import archivos
 
 
 # USO ARCHIVOS CSV DE PRUEBA (ADJUNTO LOS ARCHIVOS AL GITHUB)
 
-
+RUTA_ENTREGAS_ALUMNOS = "/entregas_alumnos"  # LLENO DE .ZIPS
+RUTA_EVALUACIONES = "evaluaciones.csv"
 RUTA_ALUMNOS = "alumnos.csv"
-ALUMNO_NOMBRE = 0
-ALUMNO_PADRON = 1
-ALUMNO_MAIL = 2
-
 RUTA_DOCENTES = "docentes.csv"
-DOCENTE_NOMBRE = 0
-DOCENTE_MAIL = 1
-
 RUTA_DYA = "docente-alumnos.csv"
-DYA_DOCENTE_NOMBRE = 0
-DYA_ALUMNO_NOMBRE = 1
 
 
-def obtener_alumnos() -> dict:
+def imprimir_diccionario_simple(diccionario: dict, forma: int = 1) -> None:
+    if forma == 1:
+        for elemento in diccionario:
+            print(f"{elemento}: {diccionario[elemento]}")
+    elif forma == 2:
+        for clave, valor in diccionario.items():
+            print(f"{clave}: {valor}")
+    
+    print("\n\n")
+
+
+def obtener_evaluaciones(evaluaciones_csv: str) -> dict:
+    pass
+
+
+def obtener_alumnos(ruta_alumnos: str) -> dict:
     # Recibe csv alumnos y genera dict alumnos
     alumnos = dict()
+    alumno_nombre = 0
+    alumno_padron = 1
+    alumno_mail = 2
 
-    with open(RUTA_ALUMNOS, mode='r', encoding="UTF-8") as archivo_csv:
+    with open(ruta_alumnos, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
         next(csv_reader)
         for fila in csv_reader:
-            alumnos[fila[ALUMNO_NOMBRE]] = (fila[ALUMNO_PADRON], fila[ALUMNO_MAIL])
+            alumnos[fila[alumno_nombre]] = (fila[alumno_padron], fila[alumno_mail])
     
     return alumnos
 
 
-def obtener_docentes() -> None:
+def obtener_docentes(ruta_docentes: str) -> None:
     # Recibe csv docentes y genera dict docentes
     docentes = dict()
+    docente_nombre = 0
+    docente_mail = 1
 
-    with open(RUTA_DOCENTES, mode='r', encoding="UTF-8") as archivo_csv:
+    with open(ruta_docentes, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
         next(csv_reader)
         for fila in csv_reader:
-            docentes[fila[DOCENTE_NOMBRE]] = fila[DOCENTE_MAIL]
+            docentes[fila[docente_nombre]] = fila[docente_mail]
     
     return docentes
 
 
-def obtener_docente_y_alumnos() -> dict:
+def obtener_docente_y_alumnos(ruta_dya: str) -> dict:
     # Recibe csv docentes-alumnos y genera dict docentes-alumnos (dya)
     dya = dict()
+    docentes_agregados = list()
 
-    with open(RUTA_DYA, mode='r', encoding="UTF-8") as archivo_csv:
+    with open(ruta_dya, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
         next(csv_reader)
+
         for fila in csv_reader:
-            dya[fila[DYA_DOCENTE_NOMBRE]] = fila[DYA_ALUMNO_NOMBRE]
+            docente = fila[0]
+            alumno = fila[1]
+            if docente not in docentes_agregados:
+                dya[docente] = [alumno]
+                docentes_agregados.append(docente)
+            else:
+                dya[docente].append(alumno)
     
     return dya
 
 
-def crear_carpetas_anidadas(alumnos: dict, docentes: dict, dya: dict) -> None:
+def crear_carpetas_anidadas(evaluaciones: dict, alumnos: dict, docentes: dict, dya: dict) -> None:
     # Recibe los csv y crea las carpetas
-    "Nota: crear carpetas para docentes sin alumnos y ubicar a los alumnos sin docentes en una carpeta aparte"
+
     docentes_nombres = list(docentes.keys())
     alumnos_nombres = list(alumnos.keys())
 
-    # Creamos las carpetas aquí
-   
+    # Creamos las carpetas de los docentes
     for i in range(len(docentes_nombres)):
         try:
             os.mkdir(docentes_nombres[i])
-            os.mkdir("(Sin docente asignado)")
         except FileExistsError:
             pass
+    
+    # Creamos las subcarpetas de alumnos
+    # Si el docente no se encuentra en dya.csv, es porque no tiene un alumno asignado
+    for docente in docentes_nombres:
+        if docente in dya:
+            for alumno in dya[docente]:
+                try:
+                    os.makedirs(f'{docente}/{alumno}')
+                except FileExistsError:
+                    pass
+    
+    # Creamos las carpetas para los alumnos huérfanos (sin docentes)
+    alumnos_asignados_aux = list(dya.values())
+    alumnos_asignados = list()
+    for i in range(len(alumnos_asignados_aux)):
+        for j in range(len(alumnos_asignados_aux[i])):
+            alumnos_asignados.append(alumnos_asignados_aux[i][j])
+
+    for alumno in alumnos_nombres:
+        if alumno not in alumnos_asignados:
+            try:
+                os.makedirs(f'(Sin docente asignado)/{alumno}')
+            except FileExistsError:
+                pass
 
 
-def generar_carpetas_evaluacion(nombre_evaluacion: str="", entrega_alumnos: dict=(), docentes_csv: str="", dya_csv: str="") -> None:
-    # Recibe el nombre de la evaluación (ej: "2021-06-15"), 
-    # la entrega de los alumnos (archivo .zip) y los .csv de los docentes-alumnos
-    alumnos = obtener_alumnos()
-    docentes = obtener_docentes()
-    dya = obtener_docente_y_alumnos()
-    #print(alumnos, docentes, dya) #debug
-    crear_carpetas_anidadas(alumnos, docentes, dya)
+def colocar_evaluaciones(evaluaciones: str, entregas_alumnos: str):
+    # Acá se copia cada archivo .zip desde "/entregas_alumnos" a su carpeta de alumno correspondiente,
+    # Además verifica que la evaluación se encuentre en la lista de evaluaciones
+
+    # Posible función para asignar a Tomi.
+    pass
 
 
-generar_carpetas_evaluacion()
+def organizar_evaluaciones(entregas_alumnos: str, evaluaciones_csv: str, alumnos_csv: str, docentes_csv: str, dya_csv: str) -> None:
+
+    # Recibe los csv de las evaluaciones, los docentes, los alumnos y los alumnos asignados a cada docente,
+    # además de las entregas de los alumnos
+
+    alumnos = obtener_alumnos(alumnos_csv)
+    docentes = obtener_docentes(docentes_csv)
+    dya = obtener_docente_y_alumnos(dya_csv)
+    evaluaciones = obtener_evaluaciones(evaluaciones_csv)
+
+    '''
+    imprimir_diccionario_simple(alumnos)
+    imprimir_diccionario_simple(docentes)
+    imprimir_diccionario_simple(dya)
+    '''
+
+    crear_carpetas_anidadas(evaluaciones, alumnos, docentes, dya)
+    colocar_evaluaciones(evaluaciones, entregas_alumnos)
+
+
+# ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
+organizar_evaluaciones(RUTA_ENTREGAS_ALUMNOS, RUTA_EVALUACIONES, RUTA_ALUMNOS, RUTA_DOCENTES, RUTA_DYA)
 
 
 '''
