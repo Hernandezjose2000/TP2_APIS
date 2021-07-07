@@ -1,6 +1,5 @@
 #Me encargo de los archivos - Tomas
 import os
-import tempfile
 import zipfile
 
 def verificador_de_archivos(archivo_local:str,archivo_drive:str)->list:
@@ -19,12 +18,16 @@ def descompresor(zip:str)->None:
     with zipfile.ZipFile(zip, 'r') as zip:
         zip.extractall()
 
-def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->None:
-    for root, files in os.walk(directorio_de_inicio, topdown=False):
-        for name in files:
-            if name == nombre_del_archivo:
-                print(os.path.join(root, name))
+def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
+    for root, dirs, files in os.walk(directorio_de_inicio, topdown=False):
+        for archivo in files:
+            if archivo == nombre_del_archivo:
+                direccion_del_archivo = os.path.join(root, archivo)
+    return direccion_del_archivo            
 
+def buscar_y_descomprimir(directorio_de_inicio:str, nombre_del_archivo:str)->None:
+    direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, nombre_del_archivo)
+    descompresor(direccion_del_archivo)
 
 
 #with tempfile.TemporaryDirectory(prefix="Drive-") as tmpdir:
