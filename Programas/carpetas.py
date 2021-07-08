@@ -3,15 +3,6 @@ import os
 import archivos
 
 
-# USO ARCHIVOS CSV DE PRUEBA (ADJUNTO LOS ARCHIVOS AL GITHUB)
-
-RUTA_ENTREGAS_ALUMNOS = "/entregas_alumnos"  # LLENO DE .ZIPS
-RUTA_EVALUACIONES = "evaluaciones.csv"
-RUTA_ALUMNOS = "alumnos.csv"
-RUTA_DOCENTES = "docentes.csv"
-RUTA_DYA = "docente-alumnos.csv"
-
-
 def imprimir_diccionario_simple(diccionario: dict) -> None:
     for elemento in diccionario:
         print(f"{elemento}: {diccionario[elemento]}")
@@ -132,18 +123,22 @@ def colocar_evaluaciones(evaluaciones: str, entregas_alumnos: str):
     # Además verifica que la evaluación se encuentre en la lista de evaluaciones
 
     # Posible función para asignar a Tomi.
+    '''
+    ZIP_PRUEBA = os.getcwd() + f"/{entregas_alumnos}/321323 - Juarez, Pepe.zip"
+    archivos.descompresor(ZIP_PRUEBA) # necesito poder pasar parámetro de ruta de descompresión
+    '''
     pass
 
 
-def organizar_evaluaciones(entregas_alumnos: str, evaluaciones_csv: str, alumnos_csv: str, docentes_csv: str, dya_csv: str) -> None:
+def organizar_evaluaciones(datos: dict, entregas_alumnos: str) -> None:
 
     # Recibe los csv de las evaluaciones, los docentes, los alumnos y los alumnos asignados a cada docente,
     # además de las entregas de los alumnos
-
-    alumnos = obtener_alumnos(alumnos_csv)
-    docentes = obtener_docentes(docentes_csv)
-    dya = obtener_docente_y_alumnos(dya_csv)
-    evaluaciones = obtener_evaluaciones(evaluaciones_csv)
+    
+    evaluaciones = obtener_evaluaciones(datos["evaluaciones.csv"])
+    alumnos = obtener_alumnos(datos["alumnos.csv"])
+    docentes = obtener_docentes(datos["docentes.csv"])
+    dya = obtener_docente_y_alumnos(datos["docente-alumnos.csv"])
 
     '''
     imprimir_diccionario_simple(alumnos)
@@ -155,13 +150,17 @@ def organizar_evaluaciones(entregas_alumnos: str, evaluaciones_csv: str, alumnos
     colocar_evaluaciones(evaluaciones, entregas_alumnos)
 
 
+# --------------------------------------------------------------------------
+
+# USO ARCHIVOS CSV DE PRUEBA (ADJUNTO LOS ARCHIVOS AL GITHUB)
+
+DATOS = datos = {"evaluaciones.csv":"evaluaciones.csv", 
+                 "alumnos.csv":"alumnos.csv", 
+                 "docentes.csv":"docentes.csv", 
+                 "dya.csv":"dya.csv"}
+               # "nombre_archivo.csv":"ruta_del_archivo.csv",
+
+RUTA_ENTREGAS_ALUMNOS = "/entregas_alumnos"  # LLENO DE .ZIPS
+
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
-organizar_evaluaciones(RUTA_ENTREGAS_ALUMNOS, RUTA_EVALUACIONES, RUTA_ALUMNOS, RUTA_DOCENTES, RUTA_DYA)
-
-
-'''
-Crear directorios:
-
-    os.mkdir('dir1')
-    os.makedirs('dir1/dir2/dir3')
-'''
+#organizar_evaluaciones(DATOS, RUTA_ENTREGAS_ALUMNOS)

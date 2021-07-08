@@ -19,6 +19,7 @@ def descompresor(zip:str)->None:
         zip.extractall()
 
 def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
+    direccion_del_archivo = ""
     for root, dirs, files in os.walk(directorio_de_inicio, topdown=False):
         for archivo in files:
             if archivo == nombre_del_archivo:
