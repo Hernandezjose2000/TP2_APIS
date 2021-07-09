@@ -1,6 +1,7 @@
 import os
 import datetime
 import time
+import csv
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -71,30 +72,18 @@ def obtener_servicio() -> Resource:
 Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmail, se debe importar, pero
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
-ASUNTO = 21
+ASUNTO = 19
 
-def almacenando_asuntos(id_mails:list, servicio:Resource): #evaluar en que campo vendra el asunto
+def almacenando_asuntos(id_mails:list, servicio:Resource) -> list:
 
     asuntos = [] #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
 
-    for i in id_mails:
-        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = i).execute()
+    for id_mail in id_mails:
+        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
         buscando_asunto = lectura_mail['payload']['headers'][ASUNTO]['value']
         asuntos.append(buscando_asunto)
 
-    print(asuntos)
-
-
-def extrayendo_nombres_alumnos(id_mails:list, servicio:Resource):
-
-    nombres_alumnos = []
-
-    for i in id_mails:
-        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = i).execute()
-        nombre_apellido_alumnos = lectura_mail['snippet']
-        nombres_alumnos.append(nombre_apellido_alumnos)
-
-    print(nombres_alumnos)
+    return asuntos
 
 
 def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
@@ -103,16 +92,17 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = [] #Se guaradaran asi ['123345', 'dhgfgh34534543']
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer:{fecha_actual}').execute() #falta colocar la query, veremos en base a que se obtienen.
+    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual}').execute()
     obteniendo_ids = emails_recibidos['messages']
     
     for id in obteniendo_ids:
+
         id_mails.append(id['id'])
-    print(id_mails)
+
     return id_mails
 
 
-def obteniendo_fecha_actual()-> int:
+def obteniendo_fecha_actual() -> int:
 
     #PRE: No recibimos nada como argumento
     #POST: Retornamos la fecha casteada como int en formato UNIX
@@ -123,12 +113,43 @@ def obteniendo_fecha_actual()-> int:
     return conversion_unix
 
 
+def validando_datos_asuntos(asuntos:list):
+
+    enlistando_asuntos = []
+    datos_alumnos = []
+    entregas_correctas = []
+    entregas_incorrectas = []
+
+    for asunto in asuntos:
+        
+        enlistando_asuntos.append(asunto.split("-"))
+    
+    with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as alumnos:
+
+        extreyendo_archivo = csv.reader(alumnos, delimiter = ";")
+        next(extreyendo_archivo)
+
+        for linea in extreyendo_archivo:
+            datos_alumnos.append(linea)
+
+        for dato in range(len(datos_alumnos)):
+
+            for j in enlistando_asuntos:
+
+                if int(j[0]) == int(datos_alumnos[dato][1]):
+                    entregas_correctas.append(j)
+                else:
+                    entregas_incorrectas.append(j)
+
+    print(entregas_correctas)
+
+
 def main():
 
     fecha = obteniendo_fecha_actual()    
     servicio = obtener_servicio()
     id_mails = obteniendo_ids_mails(servicio, fecha)
-    almacenando_asuntos(id_mails, servicio)
-    #extrayendo_nombres_alumnos(id_mails, servicio)
+    asuntos = almacenando_asuntos(id_mails, servicio)
+    validando_datos_asuntos(asuntos)
 
 main()
