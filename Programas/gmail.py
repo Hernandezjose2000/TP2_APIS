@@ -77,7 +77,7 @@ EMAIL = 1
 ARCHIVO_ADJUNTO = 1
 
 
-def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> list:
+def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
     datos_emails = {} #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
 
@@ -90,7 +90,6 @@ def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> list:
         id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']#se obtiene el id de archivo adjunto
 
         datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
-
     return datos_emails
 
 
@@ -122,35 +121,35 @@ def obteniendo_fecha_actual() -> int:
     return conversion_unix
 
 
-def validando_datos_asuntos(asuntos:list):
+def validando_datos_asuntos(id_mails:list, datos_emails:dict):
 
-    enlistando_asuntos = []
-    datos_alumnos = []
+    lineas = []
+    emails_entregas_incorrectas = []
     entregas_correctas = []
-    entregas_incorrectas = []
 
-    for asunto in asuntos:
-        
-        enlistando_asuntos.append(asunto.split("-"))
-    
-    with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as alumnos:
+    with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
 
-        extreyendo_archivo = csv.reader(alumnos, delimiter = ";")
-        next(extreyendo_archivo)
+        lectura = csv.reader(archivo, delimiter=';')
+        next(lectura)
 
-        for linea in extreyendo_archivo:
-            datos_alumnos.append(linea)
+        for linea in lectura:
+            lineas.append(linea)               
 
-        for dato in range(len(datos_alumnos)):
+        for j in id_mails:
 
-            for j in enlistando_asuntos:
-
-                if int(j[0]) == int(datos_alumnos[dato][1]):
-                    entregas_correctas.append(j)
+            k = 0
+            while k < 17: 
+                if datos_emails[j]['asunto'][0].strip(" ") in lineas[k][1]:
+                    entregas_correctas.append(datos_emails[j]['adj_id'])
+                    k = 17
                 else:
-                    entregas_incorrectas.append(datos_alumnos[3][2])
-
-    print(entregas_incorrectas)
+                    
+                    if k < 16:
+                        print("validando")
+                    else:
+                        emails_entregas_incorrectas.append(datos_emails[j]['origen'])
+                    k+=1
+        print(emails_entregas_incorrectas)
 
 
 def main():
@@ -158,8 +157,8 @@ def main():
     fecha = obteniendo_fecha_actual()    
     servicio = obtener_servicio()
     id_mails = obteniendo_ids_mails(servicio, fecha)
-    asuntos = obteniendo_datos_mails(id_mails, servicio)
-    #validando_datos_asuntos(asuntos)
+    datos_emails = obteniendo_datos_mails(id_mails, servicio)
+    validando_datos_asuntos(id_mails, datos_emails)
     
 
 main()
