@@ -73,17 +73,26 @@ Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmai
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
 ASUNTO = 19
+EMAIL = 1
+ARCHIVO_ADJUNTO = 1
+
 
 def almacenando_asuntos(id_mails:list, servicio:Resource) -> list:
 
-    asuntos = [] #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
+    datos_emails = {} #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
 
     for id_mail in id_mails:
-        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
-        buscando_asunto = lectura_mail['payload']['headers'][ASUNTO]['value']
-        asuntos.append(buscando_asunto)
 
-    return asuntos
+        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
+        obteniendo_origen = lectura_mail['payload']['headers'][16]['value'].split("<")
+        email_origen = obteniendo_origen[EMAIL].rstrip(">")
+        asunto = lectura_mail['payload']['headers'][ASUNTO]['value'].split("-")
+        id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']#se obtiene el id de archivo adjunto
+
+        datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
+
+    return datos_emails
+
 
 
 def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
@@ -92,7 +101,7 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = [] #Se guaradaran asi ['123345', 'dhgfgh34534543']
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual}').execute()
+    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual}').execute()#captar la excepcion de la no conexion al servicio
     obteniendo_ids = emails_recibidos['messages']
     
     for id in obteniendo_ids:
@@ -139,9 +148,9 @@ def validando_datos_asuntos(asuntos:list):
                 if int(j[0]) == int(datos_alumnos[dato][1]):
                     entregas_correctas.append(j)
                 else:
-                    entregas_incorrectas.append(j)
+                    entregas_incorrectas.append(datos_alumnos[3][2])
 
-    print(entregas_correctas)
+    print(entregas_incorrectas)
 
 
 def main():
@@ -150,6 +159,7 @@ def main():
     servicio = obtener_servicio()
     id_mails = obteniendo_ids_mails(servicio, fecha)
     asuntos = almacenando_asuntos(id_mails, servicio)
-    validando_datos_asuntos(asuntos)
+    #validando_datos_asuntos(asuntos)
+    
 
 main()
