@@ -98,9 +98,9 @@ def menu() -> None:
         print("1 - Listar archivos de la carpeta actual")
         print("2 - Crear un archivo")
         print("3 - Subir un archivo")
-        print("4 - Descargar un archivo")
-        print("5 - Sincronizar\n\n")
-
+        print("4 - Descargar un archivo")   #todo esto se puede enlistar, ["Google Drive - Local", "Listar archivos de la carpeta actual", ...]
+        print("5 - Sincronizar\n\n")        #y con un bucle for mostrarlo, esto se puede modularizar.
+                                      
         print("SISTEMA DE EVALUACIONES\n")
         print("6 - Generar carpetas de una evaluación")
         print("7 - Actualizar entregas de alumnos vía mail\n\n")
