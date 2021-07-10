@@ -77,7 +77,7 @@ EMAIL = 1
 ARCHIVO_ADJUNTO = 1
 
 
-def almacenando_asuntos(id_mails:list, servicio:Resource) -> list:
+def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> list:
 
     datos_emails = {} #Los almacenamos de esta manera ['28345234, TP_1', '789101112, Parcial_2', '123456, Parcial_2_Recuperatorio_1']
 
@@ -158,7 +158,7 @@ def main():
     fecha = obteniendo_fecha_actual()    
     servicio = obtener_servicio()
     id_mails = obteniendo_ids_mails(servicio, fecha)
-    asuntos = almacenando_asuntos(id_mails, servicio)
+    asuntos = obteniendo_datos_mails(id_mails, servicio)
     #validando_datos_asuntos(asuntos)
     
 
