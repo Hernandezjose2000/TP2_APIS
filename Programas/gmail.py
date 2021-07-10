@@ -1,12 +1,17 @@
+#MODULOS PROPIOS DE PYTHON
 import os
 import datetime
 import time
 import csv
+
+#modulos para la API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import base64
 
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -87,7 +92,7 @@ def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> dict:
         obteniendo_origen = lectura_mail['payload']['headers'][16]['value'].split("<")
         email_origen = obteniendo_origen[EMAIL].rstrip(">")
         asunto = lectura_mail['payload']['headers'][ASUNTO]['value'].split("-")
-        id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']#se obtiene el id de archivo adjunto
+        id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']
 
         datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
     return datos_emails
@@ -150,6 +155,22 @@ def validando_datos_asuntos(id_mails:list, datos_emails:dict):
                         emails_entregas_incorrectas.append(datos_emails[j]['origen'])
                     k+=1
         print(emails_entregas_incorrectas)
+    
+    return emails_entregas_incorrectas
+
+def enviando_mail_entregas_fallidas(servicio:Resource, entregas_incorrectas:list):
+
+
+    for mail in entregas_incorrectas:
+
+        mensaje_email ="Por favor valida tu Padron debido a que no coincide con lo que tenemos en nuestra base de datos"
+        mimeMessage = MIMEMultipart()
+        mimeMessage["to"] = mail
+        mimeMessage["subject"] = "Entrega de evaluacion"  
+        mimeMessage.attach(MIMEText(mensaje_email, "plain"))
+        decodificando_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode()
+
+        mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", body = {"raw": decodificando_mensaje}).execute()
 
 
 def main():
@@ -158,7 +179,7 @@ def main():
     servicio = obtener_servicio()
     id_mails = obteniendo_ids_mails(servicio, fecha)
     datos_emails = obteniendo_datos_mails(id_mails, servicio)
-    validando_datos_asuntos(id_mails, datos_emails)
-    
+    emails_entregas_incorrectas = validando_datos_asuntos(id_mails, datos_emails)
+    enviando_mail_entregas_fallidas(servicio, emails_entregas_incorrectas)
 
 main()
