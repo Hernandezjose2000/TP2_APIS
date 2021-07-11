@@ -1,11 +1,16 @@
 import os, io
 import os.path
 
+
+
+
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import GOOGLE_API_USE_MTLS_ENDPOINT, build, Resource
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload 
+from google.auth.transport.requests import Request
+
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -86,7 +91,7 @@ Por ahora es pura prueba y error, empirismo puro!
 def subir_archivo(servicio): #Sube un archivo al drive sin meterlo en alguna carpeta
     
     nombre_archivo = input('Ingrese el nombre del archivo junto con su extension (ej - imagengatito.png): ')
-    ruta_archivo = input('repita el paso anterior: ') #Lo tengo que optimizar, funciona si metes 2 veces el nombre y extension.
+    ruta_archivo = input('Repita el paso anterior: ') #Lo tengo que optimizar, funciona si metes 2 veces el nombre y extension.
     tipo_archivo = input ('Ingrese el tipo de archivo (ej- image/png): ')
 
     archivo_metadata = {'name': nombre_archivo}
@@ -97,21 +102,7 @@ def subir_archivo(servicio): #Sube un archivo al drive sin meterlo en alguna car
     print('ID Archivo: %s' % archivo.get('id')) 
 
 
-def descargar_archivo (servicio): #aun no funciona correctamente. está copiado directamente de Google for Developers
-    
-    nombre_archivo = input('Ingrese el nombre del archivo: ')
-   
-    request = servicio.files().get_media(fileId=nombre_archivo)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-    done = True
-    while not done: #placeholder
-     status, done = downloader.next_chunk()
-
-     print ("Download %d%%.") % int(status.progress() * 100)
-
-
-def crear_carpeta(servicio): #funciona! Voy a ver de crear una carpeta y a su vez crear archivo en dicha carpeta
+def crear_carpeta(servicio):
     nombre = input('Ingrese nombre de la carpeta a crear: ')
     carpeta_metadata = {
     'name': nombre,
@@ -121,13 +112,47 @@ def crear_carpeta(servicio): #funciona! Voy a ver de crear una carpeta y a su ve
     print ('ID Carpeta: %s' % file.get('id'))
 
 
+def listar_archivos(servicio, size = 10):
+    listar = servicio.files().list(
+        pageSize=size,fields="nextPageToken, files(id, name)").execute()
+    archivos = listar.get('files', [])
+
+    if not archivos:
+        print('No se han encontrado archivos en tu Drive.')
+    else:
+        print('Estos son TODOS tus archivos con sus IDs:')
+        print ('¡También se muestran los de tu papelera!')
+        for archivo in archivos:
+            print('{0} ({1})'.format(archivo['name'], archivo['id']))
+
+
+
+def descargar_archivo(servicio): #falta pasar a binario!
+    id_archivo = input('ID del archivo -> ')
+    ruta_archivo = input ('¿Dónde lo desea guardar? -> ')
+    request = servicio.files().get_media(fileId=id_archivo)
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while done is False:
+        status, done = downloader.next_chunk()
+        print("Download %d%%." % int(status.progress() * 100))
+    with io.open(ruta_archivo,'wb') as f:
+        fh.seek(0)
+        f.write(fh.read())
+
+
+def mover_archivo(servicio):
+    pass
 
 
 
 
 def main():
-    servicio = obtener_servicio()   
-    crear_carpeta(servicio)
+    servicio = obtener_servicio()
+    listar_archivos(servicio) 
+    descargar_archivo(servicio)
+    
 
 
 main()
