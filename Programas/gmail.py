@@ -108,9 +108,8 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     #PRE: No recibimos ningun parametro.
     #POST: Retronamos en una lista los id's de los mails.
     
-    id_mails = [] #Se guaradaran asi ['123345', 'dhgfgh34534543']
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual}').execute()
-    #captar la excepcion de la no conexion al servicio
+    id_mails = []
+    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'before: {fecha_actual}').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -133,6 +132,9 @@ def obteniendo_fecha_actual() -> int:
 
 
 def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource):
+
+    #PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
+    #POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.
 
     lineas_archivo_csv = []
     emails_entregas_incorrectas = []
@@ -166,7 +168,7 @@ def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource
 
         #enviando_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
         #enviando_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
-    
+
     return datos_entregas_correctas
 
 
@@ -189,23 +191,31 @@ def enviando_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> 
     print(f"Mensaje de {asunto} enviado! :)")
 
 
-def obteniendo_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict):
+def obteniendo_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, datos_emails:dict) -> list:
 
+    #PRE: Recibimos como diccionarios las entregas correctas y los datos de los mails.
+    #POST: Una vez obtenido el archivo adjunto, se retorna el nombre de ls archivos adjuntos como lista.
 
+    nombres_archivos_creados = []
     id_mails = []
-
+    
     for id_mail in datos_entrega_correcta:
         id_mails.append(id_mail)
 
-    for id_de_mail in id_mails:
+    for id in id_mails:
+        nombres_archivos_creados.append("".join(datos_emails[id]['asunto']))
+
+    for indice in range(len(id_mails)):
 
         archivo_adjunto = servicio.users().messages().attachments().get(userId='evaluaciontp2@gmail.com',
-                                                     messageId=id_de_mail, id=datos_entrega_correcta[id_de_mail]['id_adjunto']).execute()
+                        messageId=id_mails[indice], id=datos_entrega_correcta[id_mails[indice]]['id_adjunto']).execute()
         
         data_archivo_adjunto = archivo_adjunto['data']
-        with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\adjunto.txt", "w") as archivo:
+        with open(f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "w") as archivo:
 
             archivo.write(data_archivo_adjunto)
+        
+    return nombres_archivos_creados
 
 
 def main():
@@ -215,8 +225,6 @@ def main():
     id_mails = obteniendo_ids_mails(servicio, fecha)
     datos_emails = obteniendo_datos_mails(id_mails, servicio)
     datos_entregas_correctas = validando_padron_alumnos(id_mails, datos_emails, servicio)
-    obteniendo_archivos_adjuntos(servicio, datos_entregas_correctas)
-
-    
+    nombres_archivos_adjuntos = obteniendo_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
 main()
