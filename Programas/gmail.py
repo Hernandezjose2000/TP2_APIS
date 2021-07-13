@@ -109,7 +109,7 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = []
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'before: {fecha_actual}').execute()
+    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -166,8 +166,8 @@ def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     k+=1
 
-        #enviando_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
-        #enviando_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
+        enviando_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
+        enviando_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
 
     return datos_entregas_correctas
 
