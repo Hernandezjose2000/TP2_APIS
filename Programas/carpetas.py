@@ -157,10 +157,10 @@ def organizar_evaluaciones(datos: dict, entregas_alumnos: str) -> None:
 DATOS = datos = {"evaluaciones.csv":"evaluaciones.csv", 
                  "alumnos.csv":"alumnos.csv", 
                  "docentes.csv":"docentes.csv", 
-                 "dya.csv":"dya.csv"}
+                 "docente-alumnos.csv":"docente-alumnos.csv"}
                # "nombre_archivo.csv":"ruta_del_archivo.csv",
 
 RUTA_ENTREGAS_ALUMNOS = "/entregas_alumnos"  # LLENO DE .ZIPS
 
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
-#organizar_evaluaciones(DATOS, RUTA_ENTREGAS_ALUMNOS)
+organizar_evaluaciones(DATOS, RUTA_ENTREGAS_ALUMNOS)
