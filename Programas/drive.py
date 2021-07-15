@@ -121,38 +121,22 @@ def crear_archivo_vacio(servicio): #Crea un archivo sin contenido y sin extensio
     print ('ID archivo: %s' % file.get('id'))
 
 
-def crear_archivo(servicio):
+def crear_archivo(servicio): #Voy a matchear con la parte de Archivos de los chicos!
     pass
 
 
-
-def listar_archivos(servicio): 
-    listar = servicio.files().list(
-        pageSize=5, fields="nextPageToken, files(id, name, mimeType, parents)").execute()
-    items = listar.get('files', [])
-
-    if not items:
-        print('No se encontraron archivos.')
-    else:
-        rows = []
-        for item in items:
-
-            id = item["id"]
-            name = item["name"]
-            try:
-              parents = item["parents"]
-            except:
-              parents = "N/A"
-
-            mime_type = item["mimeType"]
-  
-            rows.append((id, name, parents, mime_type))
-        print("Archivos:")
-        print(items) #Lo voy a poner mas legible! 
-
-
-
-
+def listar_archivos_en_carpetas(servicio): #busquedas anidadas, falta pasar a español 
+    id_carp = input('ID: ')
+    query = (f'parents = "{id_carp}"')
+    response= servicio.files().list(q=query).execute()
+    files = response.get('files')
+    nextPageToken = response.get('nextPageToken')
+    
+    while nextPageToken:
+        response = servicio.files().list(q=query, pageToken=nextPageToken).execute()
+        files.extend(response.get('files'))
+        nextPageToken = response.get('nextPageToken')
+    print (files)
 
 
 def descargar_archivo(servicio): #falta pasar a binario!
@@ -170,9 +154,40 @@ def descargar_archivo(servicio): #falta pasar a binario!
         f.write(fh.read())
 
 
+def listar_archivos(servicio): #todavia no funciona bien la tabla!
+    listar = servicio.files().list(
+        pageSize=50, fields="nextPageToken, files(id, name, mimeType, parents)").execute()
+
+    items = listar.get('files', [])
+    if not items:
+        print('No se encontraron archivos.')
+    else:  
+        print("Archivos:")
+        print("{:<8} {:<10} {:<15} {:<20}".format('ID','Nombre','Tipo de Archivo','Carpeta Contenedora')) 
+        for archivo in items:
+            archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents'] = archivo
+            print ("{:<8} {:<10} {:<15} {:<20}".format( archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
+
+
+    
+
 
 def mover_archivo(servicio):
-    pass
+    listar_archivos(servicio)
+    file_id = input('Ingrese la ID del archivo que desea mover\n ID: ')
+    folder_id = input('Ingrese la ID de la carpte que desea usar\n ID: ')
+
+    # Localiza la carpeta contenedora y saca el archivo
+    file = servicio.files().get(fileId=file_id, fields='parents').execute()
+    previous_parents = ",".join(file.get('parents'))
+
+    # Mueve el archivo a la nueva carpeta
+    file = servicio.files().update(
+        fileId=file_id,
+        addParents=folder_id,
+        removeParents=previous_parents,
+        fields=('id, parents')
+    ).execute()
 
 
 
