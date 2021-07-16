@@ -1,15 +1,14 @@
 import os, io
 import os.path
 
-
-
-
+ 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import GOOGLE_API_USE_MTLS_ENDPOINT, build, Resource
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload 
 from google.auth.transport.requests import Request
+
 
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -88,7 +87,6 @@ Le voy a agregar mas detalles
 '''
 
 def subir_archivo(servicio): #Sube un archivo al drive sin meterlo en alguna carpeta
-    
     nombre_archivo = input('Ingrese el nombre del archivo junto con su extension (ej - imagengatito.png): ')
     ruta_archivo = input('Ingrese donde se encuentra el archivo (ruta completa): ')
     tipo_archivo = input ('Ingrese el tipo de archivo (ej- image/png): ')
@@ -99,24 +97,6 @@ def subir_archivo(servicio): #Sube un archivo al drive sin meterlo en alguna car
     archivo = servicio.files().create(body = archivo_metadata, media_body=media, fields='id').execute()
 
     print('ID Archivo: %s' % archivo.get('id')) 
-
-
-def listar_carpetas():
-    pass
-
-def subir_archivo_crear_carpeta(servicio): 
-    id_carpeta = input('Ingrese el id de la carpeta: ')
-    file_metadata = {
-    'name': 'photo.jpg',
-    'parents': [id_carpeta]
-    }  
-    media = MediaFileUpload('files/photo.jpg',
-                        mimetype='image/jpeg',
-                        resumable=True)
-    file = servicio.files().create(body=file_metadata,
-                                    media_body=media,
-                                    fields='id').execute()
-    print ('File ID: %s' % file.get('id'))
 
 
 
@@ -130,7 +110,7 @@ def crear_carpeta(servicio): #carpeta vacia
     print ('ID Carpeta: %s' % file.get('id'))
 
 
-def crear_archivo(servicio): #Crea un archivo sin contenido y sin extension
+def crear_archivo_vacio(servicio): #Crea un archivo sin contenido y sin extension
     nombre_nuevo_archivo = input('Ingrese el nombre del archivo a crear: ')
     file_metadata = {
     'name' : nombre_nuevo_archivo,
@@ -138,29 +118,30 @@ def crear_archivo(servicio): #Crea un archivo sin contenido y sin extension
     }
     file = servicio.files().create(body=file_metadata,
                                     fields='id').execute()
-    print ('File ID: %s' % file.get('id'))
+    print ('ID archivo: %s' % file.get('id'))
 
 
+def crear_archivo(servicio): #Voy a matchear con la parte de Archivos de los chicos!
+    pass
 
 
-def listar_archivos(servicio, size = 10): #busquedas anidadas
-    listar = servicio.files().list(
-        pageSize=size,fields="nextPageToken, files(id, name)").execute()
-    archivos = listar.get('files', [])
-
-    if not archivos:
-        print('No se han encontrado archivos en tu Drive.')
-    else:
-        print('Estos son TODOS tus archivos con sus IDs:')
-        print ('¡También se muestran los de tu papelera!')
-        for archivo in archivos:
-            print('{0} ({1})'.format(archivo['name'], archivo['id']))
-
+def listar_archivos_en_carpetas(servicio): #busquedas anidadas, falta pasar a español 
+    id_carp = input('ID: ')
+    query = (f'parents = "{id_carp}"')
+    response= servicio.files().list(q=query).execute()
+    files = response.get('files')
+    nextPageToken = response.get('nextPageToken')
+    
+    while nextPageToken:
+        response = servicio.files().list(q=query, pageToken=nextPageToken).execute()
+        files.extend(response.get('files'))
+        nextPageToken = response.get('nextPageToken')
+    print (files)
 
 
 def descargar_archivo(servicio): #falta pasar a binario!
-    id_archivo = input('ID del archivo -> ')
-    ruta_archivo = input ('¿Dónde lo desea guardar? -> ')
+    id_archivo = input('ID del archivo: ')
+    ruta_archivo = input ('¿Dónde lo desea guardar? (ruta completa): ')
     request = servicio.files().get_media(fileId=id_archivo)
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fh, request)
@@ -173,15 +154,48 @@ def descargar_archivo(servicio): #falta pasar a binario!
         f.write(fh.read())
 
 
+def listar_archivos(servicio): #todavia no funciona bien la tabla!
+    listar = servicio.files().list(
+        pageSize=50, fields="nextPageToken, files(id, name, mimeType, parents)").execute()
+
+    items = listar.get('files', [])
+    if not items:
+        print('No se encontraron archivos.')
+    else:  
+        print("Archivos:")
+        print("{:<8} {:<10} {:<15} {:<20}".format('ID','Nombre','Tipo de Archivo','Carpeta Contenedora')) 
+        for archivo in items:
+            archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents'] = archivo
+            print ("{:<8} {:<10} {:<15} {:<20}".format( archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
+
+
+    
+
+
 def mover_archivo(servicio):
-    pass
+    listar_archivos(servicio)
+    file_id = input('Ingrese la ID del archivo que desea mover\n ID: ')
+    folder_id = input('Ingrese la ID de la carpte que desea usar\n ID: ')
+
+    # Localiza la carpeta contenedora y saca el archivo
+    file = servicio.files().get(fileId=file_id, fields='parents').execute()
+    previous_parents = ",".join(file.get('parents'))
+
+    # Mueve el archivo a la nueva carpeta
+    file = servicio.files().update(
+        fileId=file_id,
+        addParents=folder_id,
+        removeParents=previous_parents,
+        fields=('id, parents')
+    ).execute()
 
 
 
 
 def main():
     servicio = obtener_servicio()
-    subir_archivo(servicio)
+    listar_archivos(servicio)
+    
     
     
 
