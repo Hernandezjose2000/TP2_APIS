@@ -109,7 +109,8 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = []
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'newer: {fecha_actual} label: inbox').execute()
+    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
+                                                        q=f'before: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -186,7 +187,8 @@ def enviando_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> 
         mimeMessage.attach(MIMEText(mensaje_email, "plain"))
         decodificando_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode()
 
-        mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", body = {"raw": decodificando_mensaje}).execute()
+        mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
+                                                    body = {"raw": decodificando_mensaje}).execute()
 
     print(f"Mensaje de {asunto} enviado! :)")
 
