@@ -84,7 +84,7 @@ estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionar
 '''
 
 
-def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> dict:
+def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
     #PRE: Recibimos la lista con los id de los mails que coinciden con la fecha actual.
     #POST: Retornamos un diccionario con los datos que requerimos obtener de estos mails enviados.
@@ -94,8 +94,8 @@ def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> dict:
     for id_mail in id_mails:
 
         lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
-        obteniendo_origen = lectura_mail['payload']['headers'][ORIGEN]['value'].split("<")
-        email_origen = obteniendo_origen[EMAIL].rstrip(">")
+        datos_origen = lectura_mail['payload']['headers'][ORIGEN]['value'].split("<")
+        email_origen = datos_origen[EMAIL].rstrip(">")
         asunto = lectura_mail['payload']['headers'][ASUNTO]['value'].split("-")
         id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']
 
@@ -104,7 +104,7 @@ def obteniendo_datos_mails(id_mails:list, servicio:Resource) -> dict:
     return datos_emails
 
 
-def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
+def obtener_ids_mails(servicio:Resource, fecha_actual:float) -> list:
 
     #PRE: No recibimos ningun parametro.
     #POST: Retronamos en una lista los id's de los mails.
@@ -122,7 +122,7 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     return id_mails
 
 
-def obteniendo_fecha_actual() -> int:
+def obtener_fecha_actual() -> int:
 
     #PRE: No recibimos nada como argumento
     #POST: Retornamos la fecha casteada como int en formato UNIX
@@ -133,7 +133,7 @@ def obteniendo_fecha_actual() -> int:
     return conversion_unix
 
 
-def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource):
+def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource):
 
     #PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
     #POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.
@@ -145,10 +145,10 @@ def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource
 
     with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
 
-        lectura = csv.reader(archivo, delimiter=';')
-        next(lectura)
+        lectura_archivo_alumnos = csv.reader(archivo, delimiter=';')
+        next(lectura_archivo_alumnos)
 
-        for linea in lectura:
+        for linea in lectura_archivo_alumnos:
             lineas_archivo_csv.append(linea)               
 
         for id_mail in id_mails:
@@ -168,13 +168,13 @@ def validando_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     k+=1
 
-        enviando_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
-        enviando_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
+        enviar_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
+        enviar_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
 
     return datos_entregas_correctas
 
 
-def enviando_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> None:
+def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> None:
 
     #PRE: Recibimos una lista con los emails de alumnos que tienen una entrega exitosa o fallida.
     #POST: Se envian los mails correspondientes a esos alumnos.
@@ -194,7 +194,7 @@ def enviando_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> 
     print(f"Mensaje de {asunto} enviado! :)")
 
 
-def obteniendo_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, datos_emails:dict) -> list:
+def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, datos_emails:dict) -> list:
 
     #PRE: Recibimos como diccionarios las entregas correctas y los datos de los mails.
     #POST: Una vez obtenido el archivo adjunto, se retorna el nombre de ls archivos adjuntos como lista.
@@ -214,22 +214,24 @@ def obteniendo_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict,
                         messageId=id_mails[indice], id=datos_entrega_correcta[id_mails[indice]]['id_adjunto']).execute()
         
         data_archivo_adjunto = archivo_adjunto['data']
-        decodificando = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
+        decodificando_archivo_adjunto = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
         
-        with open(f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
+        with open(
+        f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
+        
 
-            archivo.write(decodificando)
+            archivo.write(decodificando_archivo_adjunto)
         
     return nombres_archivos_creados
 
 
 def main():
 
-    fecha = obteniendo_fecha_actual()    
+    fecha = obtener_fecha_actual()    
     servicio = obtener_servicio()
-    id_mails = obteniendo_ids_mails(servicio, fecha)
-    datos_emails = obteniendo_datos_mails(id_mails, servicio)
-    datos_entregas_correctas = validando_padron_alumnos(id_mails, datos_emails, servicio)
-    nombres_archivos_adjuntos = obteniendo_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+    id_mails = obtener_ids_mails(servicio, fecha)
+    datos_emails = obtener_datos_mails(id_mails, servicio)
+    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio)
+    nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
 main()
