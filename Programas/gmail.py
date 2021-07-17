@@ -4,6 +4,7 @@ import datetime
 import time
 import csv
 
+import base64
 #modulos para la API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -110,7 +111,7 @@ def obteniendo_ids_mails(servicio:Resource, fecha_actual:float) -> list:
     
     id_mails = []
     emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                        q=f'before: {fecha_actual} label: inbox').execute()
+                                                        q=f'newer: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -213,9 +214,11 @@ def obteniendo_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict,
                         messageId=id_mails[indice], id=datos_entrega_correcta[id_mails[indice]]['id_adjunto']).execute()
         
         data_archivo_adjunto = archivo_adjunto['data']
-        with open(f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "w") as archivo:
+        decodificando = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
+        
+        with open(f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
 
-            archivo.write(data_archivo_adjunto)
+            archivo.write(decodificando)
         
     return nombres_archivos_creados
 

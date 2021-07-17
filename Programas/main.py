@@ -13,16 +13,6 @@
 '''
 
 '''
-def ingresar_opcion_int(rango_opciones: int) -> int:
-    opcion = input(">>> Ingrese la opción:   ")
-    while not (opcion.isnumeric() and 0 < int(opcion) <= rango_opciones):
-        if rango_opciones == 1:
-            opcion = input("Pulse 1 >>>   ")
-        else:
-            opcion = input(f"Ingrese una opcion entre 1 y {rango_opciones} >>>   ")
-    return int(opcion)
-
-
 def listar_archivos_carpeta_actual() -> None:
     print("Seleccione donde desea ver sus archivos: ")
     print("1 - Google Drive")
@@ -89,6 +79,8 @@ def generar_carpetas_evaluacion() -> None:
 def actualizar_entregas_alumnos() -> None:
     pass
 '''
+
+
 def validando_decision(decision:int) -> int:
 
     #PRE: Recibimos como entero la decision del usuario.
@@ -119,7 +111,6 @@ def decision_usuario() ->int:
             valor = True
         except ValueError:
             print("Estas introduciendo caracteres, debe ser un numero entero")
-            valor = False
 
     return decision_validada
 
