@@ -1,7 +1,7 @@
 # TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
 
-#import archivos
-#import carpetas
+import archivos
+import carpetas
 #import drive     
 import gmail
 #import os
@@ -148,7 +148,10 @@ def menu() -> None:
         elif decision ==5:
             pass
         elif decision == 6:
-            gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+            nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+            nombre_evaluacion = input("Como se llama la evaluacion: ")
+            carpetas.organizar_evaluaciones(nombres_archivos, nombre_evaluacion)
+            archivos.mover_evaluaciones(nombres_archivos)
 
         elif decision == 7:
 
