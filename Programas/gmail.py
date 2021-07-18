@@ -3,8 +3,8 @@ import os
 import datetime
 import time
 import csv
-
 import base64
+from pathlib import Path
 #modulos para la API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,19 +12,20 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import base64
 
 #constantes
-ASUNTO = 19
+ASUNTO = 20
 EMAIL = 1
 ARCHIVO_ADJUNTO = 1
-ORIGEN = 16
+ORIGEN = 17
 ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
-
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
 ]
+RUTA_CARPETA = "EVALUACIONES"
+RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
+
 
 
 def cargar_credenciales() -> Credentials:
@@ -83,7 +84,6 @@ Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmai
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
 
-
 def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
     #PRE: Recibimos la lista con los id de los mails que coinciden con la fecha actual.
@@ -94,9 +94,16 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
     for id_mail in id_mails:
 
         lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
-        datos_origen = lectura_mail['payload']['headers'][ORIGEN]['value'].split("<")
+
+        for i in lectura_mail['payload']['headers']:
+            if i['name'] == "From":
+                origen = lectura_mail['payload']['headers'].index(i)
+            if i['name'] == "Subject":
+                asunto = lectura_mail['payload']['headers'].index(i)
+
+        datos_origen = lectura_mail['payload']['headers'][origen]['value'].split("<")
         email_origen = datos_origen[EMAIL].rstrip(">")
-        asunto = lectura_mail['payload']['headers'][ASUNTO]['value'].split("-")
+        asunto = lectura_mail['payload']['headers'][asunto]['value'].split("-")
         id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']
         datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
 
@@ -110,7 +117,7 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
     
     id_mails = []
     emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                        q=f'before: {fecha_actual} label: inbox').execute()
+                                                        q=f'newer: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -141,7 +148,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
 
-    with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
+    with open(f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", "r") as archivo:
 
         lectura_archivo_alumnos = csv.reader(archivo, delimiter=';')
         next(lectura_archivo_alumnos)
@@ -217,22 +224,27 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
         data_archivo_adjunto = archivo_adjunto['data']
         decodificando_archivo_adjunto = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
         
-        with open(
-        f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
-        
+        try:
+            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS')
+        except FileExistsError:
+            pass
 
+        with open(
+        f"{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS/{nombres_archivos_creados[indice]}", "wb") as archivo:
             archivo.write(decodificando_archivo_adjunto)
         
     return nombres_archivos_creados
 
 
-def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
+def main(emails_entregas_correctas:list, emails_entregas_incorrectas) -> list:
 
     fecha = obtener_fecha_actual()    
     servicio = obtener_servicio()
     id_mails = obtener_ids_mails(servicio, fecha)
     datos_emails = obtener_datos_mails(id_mails, servicio)
-    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
-                                                      emails_entregas_correctas, emails_entregas_incorrectas)
+    #datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
+     #                                                 emails_entregas_correctas, emails_entregas_incorrectas)
 
-    nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+    #nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+
+    #return nombres_archivos_adjuntos
