@@ -90,7 +90,7 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
     # Creamos las carpetas de los docentes
     for i in range(len(docentes_nombres)):
         try:
-            os.makedirs(f'Evaluaciones/{nombre_evaluacion}/{docentes_nombres[i]}')
+            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docentes_nombres[i]}')
         except FileExistsError:
             pass
     
@@ -99,10 +99,11 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
     for docente in docentes_nombres:
         if docente in dya:
             for alumno in dya[docente]:
-                try:
-                    os.makedirs(f'Evaluaciones/{nombre_evaluacion}/{docente}/{alumno}')
-                except FileExistsError:
-                    pass
+                if alumno in entregas_alumnos:
+                    try:
+                        os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docente}/{alumno}')
+                    except FileExistsError:
+                        pass
     
     # Creamos las carpetas para los alumnos huérfanos (sin docentes)
     alumnos_asignados_aux = list(dya.values())
@@ -113,10 +114,11 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
 
     for alumno in alumnos_nombres:
         if alumno not in alumnos_asignados:
-            try:
-                os.makedirs(f'Evaluaciones/{nombre_evaluacion}/(Sin docente asignado)/{alumno}')
-            except FileExistsError:
-                pass
+            if alumno in entregas_alumnos:
+                try:
+                    os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumno}')
+                except FileExistsError:
+                    pass
 
 
 def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) -> None:
@@ -126,15 +128,16 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     entregas_alumnos_2 = dict()
     entregas_alumnos_3 = list()
 
-    for i in range(len(entregas_alumnos)):
-        entregas_alumnos_2[entregas_alumnos[i][0:6:1]] = entregas_alumnos[i][7 : len(entregas_alumnos[i]) : 1]
+    if entregas_alumnos != None:
+        for i in range(len(entregas_alumnos)):
+            entregas_alumnos_2[entregas_alumnos[i][0:6:1]] = entregas_alumnos[i][8 : len(entregas_alumnos[i]) : 1]
 
     for elemento in entregas_alumnos_2:
         entregas_alumnos_3.append(entregas_alumnos_2[elemento])
 
     datos = {"alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", 
-             "docentes.csv":f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", 
-             "docente-alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv"}
+             "docentes.csv":f"{RUTA_ENTREGAS_ALUMNOS}/docentes.csv", 
+             "docente-alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/docente-alumnos.csv"}
                # "nombre_archivo.csv":"ruta_del_archivo.csv",
     
     alumnos = obtener_alumnos(datos["alumnos.csv"])
@@ -150,8 +153,10 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
 
 
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
-ENTREGAS_ALUMNOS = ['107411 Hernandez, Jose', '789456 Villegas, Tomas']
+''''
+ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']
 crear_carpetas_evaluaciones(ENTREGAS_ALUMNOS, "Recuperatorio")
+'''
 
 '''
 from pathlib import Path

@@ -14,12 +14,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import base64
 
+from pathlib import Path
+
 #constantes
-ASUNTO = 19
+ASUNTO = 20
 EMAIL = 1
 ARCHIVO_ADJUNTO = 1
-ORIGEN = 16
+ORIGEN = 17
 ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
+
+RUTA_CARPETA = "EVALUACIONES"
+RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
@@ -141,7 +146,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
 
-    with open("\\Users\\Nestor\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
+    with open(f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", "r") as archivo:
 
         lectura_archivo_alumnos = csv.reader(archivo, delimiter=';')
         next(lectura_archivo_alumnos)
@@ -217,16 +222,19 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
         data_archivo_adjunto = archivo_adjunto['data']
         decodificando_archivo_adjunto = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
         
-        with open(
-        f"\\Users\\Nestor\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
-        
+        try:
+            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS')
+        except FileExistsError:
+            pass
 
+        with open(
+        f"{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS/{nombres_archivos_creados[indice]}", "wb") as archivo:
             archivo.write(decodificando_archivo_adjunto)
         
     return nombres_archivos_creados
 
 
-def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
+def main(emails_entregas_correctas:list, emails_entregas_incorrectas) -> list:
 
     fecha = obtener_fecha_actual()    
     servicio = obtener_servicio()
@@ -237,6 +245,4 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
 
     nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
-
-
-    print(nombres_archivos_adjuntos)
+    return nombres_archivos_adjuntos

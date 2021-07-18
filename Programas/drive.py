@@ -190,7 +190,7 @@ def listar_carpetas(servicio: Resource, size = 30): #falta detallitos!
     carpetas_aux = listar.get('files', [])
     carpetas = list()
     
-    #print(carpetas_aux)
+    print(carpetas_aux)
 
 
     

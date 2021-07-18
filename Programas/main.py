@@ -135,8 +135,6 @@ def menu() -> None:
 
         decision = decision_usuario()
         
-        
-        
         if decision == 1:
             pass
         elif decision == 2:
@@ -145,29 +143,29 @@ def menu() -> None:
             pass
         elif decision == 4:
             pass
-        elif decision ==5:
+        elif decision == 5:
             pass
         elif decision == 6:
             nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
             nombre_evaluacion = input("Como se llama la evaluacion: ")
-            carpetas.organizar_evaluaciones(nombres_archivos, nombre_evaluacion)
-            archivos.mover_evaluaciones(nombres_archivos)
 
+            #Debug
+            print(nombres_archivos)
+
+            carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
+            #archivos.mover_evaluaciones(nombres_archivos)
         elif decision == 7:
-
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
                                 "Tu padron no se encuentra en nuestra base de datos.")
 
-            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existos", 
+            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existosa", 
                                 "Tu entrega se ha recibido exitosamente.")
                                 
             emails_entregas_incorrectas = []
             emails_entregas_correctas = []
-
         else:
             continuar_en_menu = False
-
 
     print("chao!")
 
