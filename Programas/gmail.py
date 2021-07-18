@@ -3,8 +3,8 @@ import os
 import datetime
 import time
 import csv
+
 import base64
-from pathlib import Path
 #modulos para la API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,6 +12,9 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import base64
+
+from pathlib import Path
 
 #constantes
 ASUNTO = 20
@@ -19,13 +22,14 @@ EMAIL = 1
 ARCHIVO_ADJUNTO = 1
 ORIGEN = 17
 ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
+
+RUTA_CARPETA = "EVALUACIONES"
+RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
+
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
 ]
-RUTA_CARPETA = "EVALUACIONES"
-RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
-
 
 
 def cargar_credenciales() -> Credentials:
@@ -83,6 +87,7 @@ def obtener_servicio() -> Resource:
 Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmail, se debe importar, pero
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
+
 
 def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
@@ -230,7 +235,7 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
             pass
 
         with open(
-        f"{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS/{nombres_archivos_creados[indice]}", "wb") as archivo:
+        f"{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS/{nombres_archivos_creados[indice]}.zip", "wb") as archivo:
             archivo.write(decodificando_archivo_adjunto)
         
     return nombres_archivos_creados
@@ -242,9 +247,9 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas) -> list:
     servicio = obtener_servicio()
     id_mails = obtener_ids_mails(servicio, fecha)
     datos_emails = obtener_datos_mails(id_mails, servicio)
-    #datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
-     #                                                 emails_entregas_correctas, emails_entregas_incorrectas)
+    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
+                                                      emails_entregas_correctas, emails_entregas_incorrectas)
 
-    #nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+    nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
-    #return nombres_archivos_adjuntos
+    return nombres_archivos_adjuntos
