@@ -103,14 +103,14 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
     return datos_emails
 
 
-def obtener_ids_mails(servicio:Resource, fecha_actual:float) -> list:
+def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
 
     #PRE: No recibimos ningun parametro.
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = []
     emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                        q=f'newer: {fecha_actual} label: inbox').execute()
+                                                        q=f'before: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -173,20 +173,26 @@ def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> No
 
     #PRE: Recibimos una lista con los emails de alumnos que tienen una entrega exitosa o fallida.
     #POST: Se envian los mails correspondientes a esos alumnos.
-    print("enviando mails...")
-    for mail in entregas:
+    
+    if len(entregas) == 0:
 
-        mensaje_email = cuerpo
-        mimeMessage = MIMEMultipart()
-        mimeMessage["to"] = mail
-        mimeMessage["subject"] = asunto  
-        mimeMessage.attach(MIMEText(mensaje_email, "plain"))
-        decodificando_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode()
+        print(f"\n\nNo hay {asunto} que actualizar via mail") 
 
-        mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
-                                                    body = {"raw": decodificando_mensaje}).execute()
+    else:
 
-    print(f"Mensaje de {asunto} enviado! :)")
+        for mail in entregas:
+
+            mensaje_email = cuerpo
+            mimeMessage = MIMEMultipart()
+            mimeMessage["to"] = mail
+            mimeMessage["subject"] = asunto  
+            mimeMessage.attach(MIMEText(mensaje_email, "plain"))
+            decodificando_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode()
+
+            mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
+                                                        body = {"raw": decodificando_mensaje}).execute()
+
+            print(f"Mensaje de {asunto} enviado! :)")
 
 
 def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, datos_emails:dict) -> list:
@@ -230,5 +236,3 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
                                                       emails_entregas_correctas, emails_entregas_incorrectas)
 
     nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
-
-
