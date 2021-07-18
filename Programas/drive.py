@@ -79,15 +79,24 @@ def obtener_servicio() -> Resource:
     
 #----------------TP2-APIS-FUNCIONALIDAD_DRIVE------------------
 
-def subir_archivo(servicio:Resource) -> None:  
+TIPO_ARCHIVOS = ['text/x-python-script',
+'video/mp4',
+'text/txt',
+'text/plain',
+'text/csv',
+'image/png',
+'image/jpg']
+
+
+def subir_archivo(servicio:Resource, ruta_archivo) -> None:  
     '''
     PRE: Recibe datos del archivo que se desea subir. 
     POST: Sube el archivo al drive y le muestra al usuario la ID del mismo. No se sube a ninguna carpeta.
     '''
+    print (TIPO_ARCHIVOS)
     nombre_archivo = input('Ingrese el nombre del archivo junto con su extension (ej - imagengatito.png): ')
-    ruta_archivo = input('Ingrese donde se encuentra el archivo (ruta completa): ')
     tipo_archivo = input ('Ingrese el tipo de archivo (ej- image/png): ')
-
+    
     archivo_metadata = {'name': nombre_archivo}
 
     tipo = MediaFileUpload(ruta_archivo,  mimetype=tipo_archivo)
@@ -142,26 +151,30 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
     print (archivos)
 
 
-def descargar_archivo(servicio:Resource) -> None: #falta pasar a binario!
+def descargar_archivo(servicio:Resource, ruta_archivo_descargado) -> None: #falta pasar a binario!
     '''
     PRE:
     POST: 
     '''
-    id_archivo = input('ID del archivo: ')
-    ruta_archivo = input ('¿Dónde lo desea guardar? (ruta completa): ')
-    request = servicio.files().get_media(fileId=id_archivo)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-        print("Download %d%%." % int(status.progress() * 100))
-    with io.open(ruta_archivo,'wb') as f:
-        fh.seek(0)
-        f.write(fh.read())
+    listar_archivos(servicio)
+    n = int (input('¿Cuántos archivos quiere descagar? '))
+    for i in range (n):
+       id_archivo = input('ID del archivo: ')
+       
+    
+       request = servicio.files().get_media(fileId=id_archivo)
+       fh = io.BytesIO()
+       descarga = MediaIoBaseDownload(fh, request)
+       done = False
+       while done is False:
+            status, done = descarga.next_chunk()
+            print("Download %d%%." % int(status.progress() * 100))
+       with io.open(ruta_archivo_descargado,'wb') as f:
+            fh.seek(0)
+            f.write(fh.read())
 
 
-def listar_archivos(servicio:Resource, size = 30) -> None:
+def listar_archivos(servicio:Resource, size = 20) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
     POST: Muestra TODOS los archivos en el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
@@ -175,41 +188,27 @@ def listar_archivos(servicio:Resource, size = 30) -> None:
     else:  
         print("Archivos:\n")
         for archivo in archivos:
+            if archivo['mimeType'] != "application/vnd.google-apps.folder":
+                print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
 
-            print (" ID: {0:<20} | Nombre: {1:>10} | Tipo de Archivo: {2:>15} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
 
-
-def listar_carpetas(servicio: Resource, size = 30): #falta detallitos!
+def listar_carpetas(servicio: Resource, size = 30):
     '''
     PRE: Analiza el tipo de archivo de todos los archivos en el drive
     POST: Imprime por pantalla el ID, Nombre y tipo de archivo de las carpetas. 
     '''
-    mimeType = 'application/vnd.google-apps.folder'
+
     listar = servicio.files().list(
-         pageSize=size,fields="nextPageToken, files(id, name, mimeType, parents)").execute()
+         pageSize=size,fields="nextPageToken, files(id, name, mimeType)").execute()
     carpetas_aux = listar.get('files', [])
     carpetas = list()
-    
-    print(carpetas_aux)
-
-
     
     for i in range(len(carpetas_aux)):
             if carpetas_aux[i]['mimeType'] == "application/vnd.google-apps.folder":
                 carpetas.append(carpetas_aux[i])
         
-
-
-    '''
-    carpetas = list()
-
-    for elemento in carpetas_aux:
-        if elemento.mimeType == 'application/vnd.google-apps.folder':
-            carpetas.append(elemento)
-    '''
-
     for carpeta in carpetas:
-        print (" ID: {0:<20} | Nombre: {1:>10} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
+        print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
 
 
 def mover_archivo(servicio:Resource) -> None:
@@ -218,17 +217,18 @@ def mover_archivo(servicio:Resource) -> None:
     POST: Mueve el archivo
     '''
     listar_archivos(servicio)
-    file_id = input('Ingrese la ID del archivo que desea mover: ')
-    folder_id = input('Ingrese la ID de la carpte que desea usar: ')
+    id_archivo_mover = input('Ingrese la ID del archivo que desea mover: ')
+    listar_carpetas(servicio)
+    nueva_carpeta_contenedora = input('Ingrese la ID de la carpte que desea usar: ')
 
     # Localiza la carpeta contenedora y saca el archivo
-    file = servicio.files().get(fileId=file_id, fields='parents').execute()
+    file = servicio.files().get(fileId=id_archivo_mover, fields='parents').execute()
     previous_parents = ",".join(file.get('parents'))
 
     # Mueve el archivo a la nueva carpeta
     file = servicio.files().update(
-        fileId=file_id,
-        addParents=folder_id,
+        fileId=id_archivo_mover,
+        addParents=nueva_carpeta_contenedora,
         removeParents=previous_parents,
         fields=('id, parents')
     ).execute()
@@ -236,7 +236,8 @@ def mover_archivo(servicio:Resource) -> None:
 
 def main() -> None:
     servicio = obtener_servicio()
-    listar_carpetas(servicio)
+    #agreguen la funcion que quieran probar
+    
 
 
 main()
