@@ -39,24 +39,17 @@ def copiador_de_archivos(archivo_a_copiar:str,archivo_a_reemplazar:str)->None:
 
 
 def descompresor(zip:str)->None:
-        nombre_del_corrector = str()
-
         archivo = os.path.basename(zip)
+        print(archivo)
         archivo_separado = os.path.splitext(archivo)
-        nombre_del_alumno = archivo_separado[0].split(" - ")
-        
-        with open ("Programas/docente-alumnos.csv", mode="r") as archivo_csv:
-            csv_reader = csv.reader(archivo_csv, delimiter= ";")
-            next(csv_reader)
-            for linea in csv_reader:
-                if nombre_del_alumno[1] == linea[1]:
-                    nombre_del_corrector = linea[0]
+        print(archivo_separado)
+        nombre_del_alumno = archivo_separado[0].split("  ")
+        print(nombre_del_alumno[1])
 
         for root, directorios, archivos in os.walk(DIRECTORIO_DE_INICIO, topdown=False):
             for carpeta in directorios:
-                if nombre_del_corrector == carpeta:
-                    direccion_de_la_carpeta = os.path.join(root, nombre_del_corrector)
-                    direccion_final = os.path.join(direccion_de_la_carpeta, nombre_del_alumno[1])
+                if nombre_del_alumno[1] == carpeta:
+                    direccion_final = os.path.join(root, nombre_del_alumno[1])
                     with zipfile.ZipFile(zip, 'r') as zip:
                         zip.extractall(direccion_final)
         
@@ -77,6 +70,7 @@ def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
 
 def buscar_y_descomprimir(directorio_de_inicio:str, lista_de_archivos:list)->None:
     for archivo in lista_de_archivos:
+        archivo = archivo +".zip"
         direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
         descompresor(direccion_del_archivo)
 
@@ -138,9 +132,3 @@ def crear_archivos(directorio_de_guardado:str, directorio_de_inicio:str)->None:
 
         else:
             print("Error: Extension No Valida")
-
-
-def main()->None:
-    directorio = "C:/Users/tomis/Desktop/UBA/Testeo/TP2/Juan_Perez/Puntin2/107411 - Hernandez, Jose.zip"
-    descompresor(directorio)
-main()
