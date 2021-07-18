@@ -4,10 +4,11 @@ import zipfile
 import tempfile
 import csv
 import shutil
+from pathlib import Path
 
+RUTA_CARPETA = "EVALUACIONES"
 FORMATOS_DE_ARCHIVOS = [".py",".txt",".csv"]
-DIRECTORIO_DE_INICIO = "C:/Users/tomis/Desktop/UBA/Testeo"
-
+DIRECTORIO_DE_INICIO = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 def verificador_de_archivo_mas_nuevo(archivo_local:str,archivo_drive:str)->None:
         archivo_mas_nuevo = ""
@@ -74,9 +75,10 @@ def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
     return direccion_del_archivo
 
 
-def buscar_y_descomprimir(directorio_de_inicio:str, nombre_del_archivo:str)->None:
-    direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, nombre_del_archivo)
-    descompresor(direccion_del_archivo)
+def buscar_y_descomprimir(directorio_de_inicio:str, lista_de_archivos:list)->None:
+    for archivo in lista_de_archivos:
+        direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
+        descompresor(direccion_del_archivo)
 
 
 def sincronizacion(direccion:str, directorio_de_inicio:str)->None:
@@ -110,24 +112,32 @@ def sincronizacion(direccion:str, directorio_de_inicio:str)->None:
 
 
 def crear_archivos(directorio_de_guardado:str, directorio_de_inicio:str)->None:
-    nombre_del_archivo = input("Decime el nombre del archivo: ")
-    print (f"Estos son los tipos de extension validos: {FORMATOS_DE_ARCHIVOS}")
-    extension = input("Decime una extension valida: ")
-    
-    if extension in FORMATOS_DE_ARCHIVOS:
-        archivo = nombre_del_archivo + extension
-        archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
-        
-        if not archivo_existente  == "":
-            print("Error: Archivo ya existe")
-        
+    dejar_de_crear_archivos = False
+    while not dejar_de_crear_archivos:
+        nombre_del_archivo = input("Decime el nombre del archivo: ")
+        print (f"Estos son los tipos de extension validos: {FORMATOS_DE_ARCHIVOS}")
+        extension = input("Decime una extension valida: ")
+
+        if extension in FORMATOS_DE_ARCHIVOS:
+            archivo = nombre_del_archivo + extension
+            archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
+            
+            if not archivo_existente  == "":
+                print("Error: Archivo ya existe")
+            
+            else:
+                direccion_del_archivo = os.path.join(directorio_de_guardado, archivo)
+                open(direccion_del_archivo, "x")
+                print("Archivo creado")        
+                mover_archivo = input("Queres mover el archivo? s/n ")
+                if mover_archivo == "s":
+                    mover_archivo(direccion_del_archivo,archivo)
+            seguir_creando =  int(input("1. Crear otro archivo 2. Dejar de Crear"))
+            if seguir_creando == 2:
+                dejar_de_crear_archivos = True
+
         else:
-            direccion_del_archivo = os.path.join(directorio_de_guardado, archivo)
-            open(direccion_del_archivo, "x")
-            print("Archivo creado")        
-            mover_archivo = input("Queres mover el archivo? s/n ")
-            if mover_archivo == "s":
-                mover_archivo(direccion_del_archivo,archivo)
+            print("Error: Extension No Valida")
 
 
 def main()->None:
