@@ -118,7 +118,7 @@ def crear_carpetas_anidadas(evaluaciones: dict, alumnos: dict, docentes: dict, d
                     pass
 
 
-def colocar_evaluaciones(evaluaciones: str, entregas_alumnos: str):
+def colocar_evaluaciones(entregas_alumnos: str):
     # Acá se copia cada archivo .zip desde "/entregas_alumnos" a su carpeta de alumno correspondiente,
     # Además verifica que la evaluación se encuentre en la lista de evaluaciones
 
@@ -147,7 +147,7 @@ def organizar_evaluaciones(datos: dict, entregas_alumnos: str) -> None:
     '''
 
     crear_carpetas_anidadas(evaluaciones, alumnos, docentes, dya)
-    colocar_evaluaciones(evaluaciones, entregas_alumnos)
+    colocar_evaluaciones(entregas_alumnos)
 
 
 # --------------------------------------------------------------------------
@@ -160,7 +160,17 @@ DATOS = datos = {"evaluaciones.csv":"evaluaciones.csv",
                  "docente-alumnos.csv":"docente-alumnos.csv"}
                # "nombre_archivo.csv":"ruta_del_archivo.csv",
 
-RUTA_ENTREGAS_ALUMNOS = "/entregas_alumnos"  # LLENO DE .ZIPS
+RUTA_CARPETA = "EVALUACIONES"
+
+RUTA_ENTREGAS_ALUMNOS = f"Path.home()/Desktop/{RUTA_CARPETA}/entregas_alumnos"  # LLENO DE .ZIPS
 
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
 organizar_evaluaciones(DATOS, RUTA_ENTREGAS_ALUMNOS)
+
+
+'''
+from pathlib import Path
+home = str(Path.home())
+
+print(home)
+'''

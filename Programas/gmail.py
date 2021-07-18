@@ -110,7 +110,7 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
     
     id_mails = []
     emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                        q=f'before: {fecha_actual} label: inbox').execute()
+                                                        q=f'newer: {fecha_actual} label: inbox').execute()
 
     obteniendo_ids = emails_recibidos['messages']
     
@@ -141,7 +141,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
 
-    with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
+    with open("\\Users\\Nestor\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
 
         lectura_archivo_alumnos = csv.reader(archivo, delimiter=';')
         next(lectura_archivo_alumnos)
@@ -218,7 +218,7 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
         decodificando_archivo_adjunto = base64.urlsafe_b64decode(data_archivo_adjunto.encode('UTF-8'))
         
         with open(
-        f"\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
+        f"\\Users\\Nestor\\TP2_APIS\\Programas\\{nombres_archivos_creados[indice]}", "wb") as archivo:
         
 
             archivo.write(decodificando_archivo_adjunto)
@@ -236,3 +236,7 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
                                                       emails_entregas_correctas, emails_entregas_incorrectas)
 
     nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+
+
+
+    print(nombres_archivos_adjuntos)
