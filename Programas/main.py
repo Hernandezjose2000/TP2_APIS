@@ -1,28 +1,18 @@
 # TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
 
-import archivos
-import carpetas
+#import archivos
+#import carpetas
 #import drive     
-#import gmail
-import os
-import time
+import gmail
+#import os
+#import time
 
 '''
     Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
     o el programa no va a funcar porque no los encuentra
 '''
 
-
-def ingresar_opcion_int(rango_opciones: int) -> int:
-    opcion = input(">>> Ingrese la opción:   ")
-    while not (opcion.isnumeric() and 0 < int(opcion) <= rango_opciones):
-        if rango_opciones == 1:
-            opcion = input("Pulse 1 >>>   ")
-        else:
-            opcion = input(f"Ingrese una opcion entre 1 y {rango_opciones} >>>   ")
-    return int(opcion)
-
-
+'''
 def listar_archivos_carpeta_actual() -> None:
     print("Seleccione donde desea ver sus archivos: ")
     print("1 - Google Drive")
@@ -88,43 +78,95 @@ def generar_carpetas_evaluacion() -> None:
 
 def actualizar_entregas_alumnos() -> None:
     pass
+'''
+
+
+def validar_decision(decision:int) -> int:
+
+    #PRE: Recibimos como entero la decision del usuario.
+    #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
+    
+    numero_fuera_de_rango = True
+    while numero_fuera_de_rango:
+
+        if decision < 1 or decision > 8:
+            decision = int(input("Esta introduciendo un valor que no esta en el rango, introduce de vuelta "))
+        else:
+            numero_fuera_de_rango = False
+    
+    return decision
+
+
+def decision_usuario() ->int:
+
+    #PRE: No recibimos ningun parametro
+    #POST: Se retorna la decision del usuario como un entero.
+
+    valor = False
+    while valor == False:
+
+        try:
+            decision = int(input("\nMarque la opcion deseada "))
+            decision_validada = validar_decision(decision)
+            valor = True
+        except ValueError:
+            print("Estas introduciendo caracteres, debe ser un numero entero")
+
+    return decision_validada
 
 
 def menu() -> None:
+
+    emails_entregas_correctas = []
+    emails_entregas_incorrectas = []
+
     continuar_en_menu = True
-
     while continuar_en_menu:
-        print("GOOGLE DRIVE - LOCAL\n")
-        print("1 - Listar archivos de la carpeta actual")
-        print("2 - Crear un archivo")
-        print("3 - Subir un archivo")
-        print("4 - Descargar un archivo")   #todo esto se puede enlistar, ["Google Drive - Local", "Listar archivos de la carpeta actual", ...]
-        print("5 - Sincronizar\n\n")        #y con un bucle for mostrarlo, esto se puede modularizar.
-                                      
-        print("SISTEMA DE EVALUACIONES\n")
-        print("6 - Generar carpetas de una evaluación")
-        print("7 - Actualizar entregas de alumnos vía mail\n\n")
 
-        print("8 - Salir\n")
+        opciones = ["Listar archivos de la carpeta actual","Crear un archivo", 
+                    "Subir un archivo", "Descargar un archivo", "Sincronizar",
+                    "Generar carpetas de una evaluación",
+                    "Actualizar entregas de alumnos vía mail",
+                    "Salir"]
 
-        opcion = ingresar_opcion_int(8)
+        for opcion in range(len(opciones)):
+            
+            print(f"{opcion+1}) {opciones[opcion]}")
 
-        if opcion == 1:
-            listar_archivos_carpeta_actual()
-        elif opcion == 2:
-            crear_archivo()
-        elif opcion == 3:
-            subir_archivo()
-        elif opcion == 4:
-            descargar_archivo()
-        elif opcion == 5:
-            sincronizar()
-        elif opcion == 6:
-            generar_carpetas_evaluacion()
-        elif opcion == 7:
-            actualizar_entregas_alumnos()
-        elif opcion == 8:
+        decision = decision_usuario()
+        
+        
+        
+        if decision == 1:
+            pass
+        elif decision == 2:
+            pass
+        elif decision == 3:
+            pass
+        elif decision == 4:
+            pass
+        elif decision ==5:
+            pass
+        elif decision == 6:
+            gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+
+        elif decision == 7:
+
+            servicio = gmail.obtener_servicio()
+            gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
+                                "Tu padron no se encuentra en nuestra base de datos.")
+
+            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existos", 
+                                "Tu entrega se ha recibido exitosamente.")
+                                
+            emails_entregas_incorrectas = []
+            emails_entregas_correctas = []
+
+        else:
             continuar_en_menu = False
+
+
+    print("chao!")
 
 
 def main() -> None:
