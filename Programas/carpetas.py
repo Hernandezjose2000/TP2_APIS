@@ -119,6 +119,14 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                     os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumno}')
                 except FileExistsError:
                     pass
+    
+    '''
+    for root, directorios, archivos in os.walk(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/', topdown=False):
+        for carpeta in directorios:
+            if not os.listdir(carpeta):
+                os.rmdir(carpeta)
+                print(f"Borrado directorio vacio {carpeta}.")
+    '''
 
 
 def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) -> None:

@@ -6,6 +6,10 @@ import carpetas
 import gmail
 #import os
 #import time
+from pathlib import Path
+
+RUTA_CARPETA = "EVALUACIONES"
+RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
 
 '''
     Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
@@ -153,7 +157,7 @@ def menu() -> None:
             print(nombres_archivos)
 
             carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
-            #archivos.mover_evaluaciones(nombres_archivos)
+            #archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
         elif decision == 7:
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
@@ -176,3 +180,6 @@ def main() -> None:
         
 
 main()
+
+
+# ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']
