@@ -1,11 +1,15 @@
 # TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
 
-#import archivos
-#import carpetas
+import archivos
+import carpetas
 #import drive     
 import gmail
 #import os
 #import time
+from pathlib import Path
+
+RUTA_CARPETA = "EVALUACIONES"
+RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
 
 '''
     Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
@@ -135,8 +139,6 @@ def menu() -> None:
 
         decision = decision_usuario()
         
-        
-        
         if decision == 1:
             pass
         elif decision == 2:
@@ -145,26 +147,29 @@ def menu() -> None:
             pass
         elif decision == 4:
             pass
-        elif decision ==5:
+        elif decision == 5:
             pass
         elif decision == 6:
-            gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+            nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+            nombre_evaluacion = input("Como se llama la evaluacion: ")
 
+            #Debug
+            print(nombres_archivos)
+
+            carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
+            #archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
         elif decision == 7:
-
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
                                 "Tu padron no se encuentra en nuestra base de datos.")
 
-            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existos", 
+            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existosa", 
                                 "Tu entrega se ha recibido exitosamente.")
                                 
             emails_entregas_incorrectas = []
             emails_entregas_correctas = []
-
         else:
             continuar_en_menu = False
-
 
     print("chao!")
 
@@ -175,3 +180,6 @@ def main() -> None:
         
 
 main()
+
+
+# ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']

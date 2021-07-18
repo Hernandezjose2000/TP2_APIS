@@ -187,16 +187,29 @@ def listar_carpetas(servicio: Resource, size = 30): #falta detallitos!
     mimeType = 'application/vnd.google-apps.folder'
     listar = servicio.files().list(
          pageSize=size,fields="nextPageToken, files(id, name, mimeType, parents)").execute()
-    carpetas = listar.get('files', [])
+    carpetas_aux = listar.get('files', [])
+    carpetas = list()
+    
+    print(carpetas_aux)
 
-    if not carpetas:
-        print('No se encontraron carpetas.')
 
-    else:  
-        if mimeType == 'application/vnd.google-apps.folder':
-           print("Carpetas:\n")
-           for carpeta in carpetas:
-             print (" ID: {0:<20} | Nombre: {1:>10} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
+    
+    for i in range(len(carpetas_aux)):
+            if carpetas_aux[i]['mimeType'] == "application/vnd.google-apps.folder":
+                carpetas.append(carpetas_aux[i])
+        
+
+
+    '''
+    carpetas = list()
+
+    for elemento in carpetas_aux:
+        if elemento.mimeType == 'application/vnd.google-apps.folder':
+            carpetas.append(elemento)
+    '''
+
+    for carpeta in carpetas:
+        print (" ID: {0:<20} | Nombre: {1:>10} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
 
 
 def mover_archivo(servicio:Resource) -> None:
@@ -224,7 +237,6 @@ def mover_archivo(servicio:Resource) -> None:
 def main() -> None:
     servicio = obtener_servicio()
     listar_carpetas(servicio)
-    
 
 
 main()
