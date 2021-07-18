@@ -3,7 +3,7 @@
 #import archivos
 #import carpetas
 #import drive     
-#import gmail
+import gmail
 #import os
 #import time
 
@@ -81,7 +81,7 @@ def actualizar_entregas_alumnos() -> None:
 '''
 
 
-def validando_decision(decision:int) -> int:
+def validar_decision(decision:int) -> int:
 
     #PRE: Recibimos como entero la decision del usuario.
     #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
@@ -107,7 +107,7 @@ def decision_usuario() ->int:
 
         try:
             decision = int(input("\nMarque la opcion deseada "))
-            decision_validada = validando_decision(decision)
+            decision_validada = validar_decision(decision)
             valor = True
         except ValueError:
             print("Estas introduciendo caracteres, debe ser un numero entero")
@@ -116,6 +116,9 @@ def decision_usuario() ->int:
 
 
 def menu() -> None:
+
+    emails_entregas_correctas = []
+    emails_entregas_incorrectas = []
 
     continuar_en_menu = True
     while continuar_en_menu:
@@ -132,11 +135,36 @@ def menu() -> None:
 
         decision = decision_usuario()
         
-        if decision == 8:
-            continuar_en_menu = False
+        
+        
+        if decision == 1:
+            pass
+        elif decision == 2:
+            pass
+        elif decision == 3:
+            pass
+        elif decision == 4:
+            pass
+        elif decision ==5:
+            pass
+        elif decision == 6:
+            gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+
+        elif decision == 7:
+
+            servicio = gmail.obtener_servicio()
+            gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
+                                "Tu padron no se encuentra en nuestra base de datos.")
+
+            gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existos", 
+                                "Tu entrega se ha recibido exitosamente.")
+                                
+            emails_entregas_incorrectas = []
+            emails_entregas_correctas = []
 
         else:
-            pass
+            continuar_en_menu = False
+
 
     print("chao!")
 

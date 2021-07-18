@@ -98,7 +98,6 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
         email_origen = datos_origen[EMAIL].rstrip(">")
         asunto = lectura_mail['payload']['headers'][ASUNTO]['value'].split("-")
         id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']
-
         datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
 
     return datos_emails
@@ -133,15 +132,14 @@ def obtener_fecha_actual() -> int:
     return conversion_unix
 
 
-def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource):
+def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
+                            emails_entregas_correctas:list, emails_entregas_incorrectas:list) -> dict:
 
     #PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
     #POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.
 
     lineas_archivo_csv = []
-    emails_entregas_incorrectas = []
     datos_entregas_correctas = {}
-    email_entregas_correctas = []
 
     with open("\\Users\\joseh\\Documents\\algoritmos_y_programacion_1\\TP2_APIS\\Programas\\alumnos.csv", "r") as archivo:
 
@@ -152,24 +150,21 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource):
             lineas_archivo_csv.append(linea)               
 
         for id_mail in id_mails:
-
             k = 0
+
             while k < 17:
 
                 if datos_emails[id_mail]['asunto'][0].strip(" ") in lineas_archivo_csv[k][1]:
-                    email_entregas_correctas.append(datos_emails[id_mail]['origen'])
+                    emails_entregas_correctas.append(datos_emails[id_mail]['origen'])
                     datos_entregas_correctas[id_mail] = {"id_adjunto":datos_emails[id_mail]['adj_id']}
                     k = 17
 
                 else:                  
                     if k < 16:
-                        print("validando")
+                        print("validando padrones")
                     else:
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     k+=1
-
-        enviar_mails(servicio, emails_entregas_incorrectas, asunto="Entrega fallida", cuerpo = "Tu padron no coincide con nuestra base de datos")
-        enviar_mails(servicio, email_entregas_correctas, asunto = "Entrega correcta", cuerpo = "Tu entrega ha sido exitosa")
 
     return datos_entregas_correctas
 
@@ -178,7 +173,7 @@ def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> No
 
     #PRE: Recibimos una lista con los emails de alumnos que tienen una entrega exitosa o fallida.
     #POST: Se envian los mails correspondientes a esos alumnos.
-
+    print("enviando mails...")
     for mail in entregas:
 
         mensaje_email = cuerpo
@@ -225,13 +220,15 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
     return nombres_archivos_creados
 
 
-def main():
+def main(emails_entregas_correctas:list, emails_entregas_incorrectas):
 
     fecha = obtener_fecha_actual()    
     servicio = obtener_servicio()
     id_mails = obtener_ids_mails(servicio, fecha)
     datos_emails = obtener_datos_mails(id_mails, servicio)
-    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio)
+    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
+                                                      emails_entregas_correctas, emails_entregas_incorrectas)
+
     nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
-main()
+
