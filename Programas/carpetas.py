@@ -120,14 +120,20 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                 except FileExistsError:
                     pass
     
-    '''
-    for root, directorios, archivos in os.walk(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/', topdown=False):
-        for carpeta in directorios:
-            if not os.listdir(carpeta):
-                os.rmdir(carpeta)
-                print(f"Borrado directorio vacio {carpeta}.")
-    '''
+    carpetas = os.listdir(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/')
 
+    for carpeta in carpetas:
+        carpeta_actual = f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{carpeta}'
+        try:
+            if len(os.listdir(carpeta_actual)) == 0:
+                try:
+                    os.rmdir(carpeta_actual)
+                except FileNotFoundError:
+                    pass
+                print(f"Borrado directorio vacio {carpeta_actual}.")
+        except FileNotFoundError:
+            pass
+    
 
 def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) -> None:
     # Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente,
