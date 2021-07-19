@@ -1,5 +1,6 @@
 # TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
 
+
 import archivos
 import carpetas
 #import drive     
@@ -8,8 +9,10 @@ import gmail
 #import time
 from pathlib import Path
 
+
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
+
 
 '''
     Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
@@ -86,7 +89,6 @@ def actualizar_entregas_alumnos() -> None:
 
 
 def validar_decision(decision:int) -> int:
-
     #PRE: Recibimos como entero la decision del usuario.
     #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
     
@@ -102,7 +104,6 @@ def validar_decision(decision:int) -> int:
 
 
 def decision_usuario() ->int:
-
     #PRE: No recibimos ningun parametro
     #POST: Se retorna la decision del usuario como un entero.
 
@@ -110,7 +111,7 @@ def decision_usuario() ->int:
     while valor == False:
 
         try:
-            decision = int(input("\nMarque la opcion deseada "))
+            decision = int(input("\nMarque la opcion deseada:  "))
             decision_validada = validar_decision(decision)
             valor = True
         except ValueError:
@@ -120,12 +121,12 @@ def decision_usuario() ->int:
 
 
 def menu() -> None:
-
-    emails_entregas_correctas = []
-    emails_entregas_incorrectas = []
-
+    emails_entregas_correctas = list()
+    emails_entregas_incorrectas = list()
     continuar_en_menu = True
+
     while continuar_en_menu:
+        print("------------------- SISTEMA DE EVALUACIONES 'GAME OF WHILES' -------------------\n")
 
         opciones = ["Listar archivos de la carpeta actual","Crear un archivo", 
                     "Subir un archivo", "Descargar un archivo", "Sincronizar",
@@ -134,8 +135,7 @@ def menu() -> None:
                     "Salir"]
 
         for opcion in range(len(opciones)):
-            
-            print(f"{opcion+1}) {opciones[opcion]}")
+            print(f"{opcion + 1}) {opciones[opcion]}")
 
         decision = decision_usuario()
         
@@ -151,13 +151,23 @@ def menu() -> None:
             pass
         elif decision == 6:
             nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
-            nombre_evaluacion = input("Como se llama la evaluacion: ")
 
-            #Debug
-            print(nombres_archivos)
+            if len(nombres_archivos) == 0:
+                print("Por hoy no tenemos emails de evaluaciones!")
 
-            carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
-            #archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
+            else:
+                nombre_evaluacion = input("Como se llama la evaluacion: ")
+                carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
+                #archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
+
+                '''
+                entregaron = nombres_archivos
+                no_entregaron = carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
+
+                if input("¿Desea ver quienes entregaron hasta ahora y quiénes no? (s/n):  ").lower() = "s":
+                    carpetas.mostrar_entregas(entregaron, no_entregaron)
+                '''
+
         elif decision == 7:
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
@@ -166,8 +176,8 @@ def menu() -> None:
             gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega existosa", 
                                 "Tu entrega se ha recibido exitosamente.")
                                 
-            emails_entregas_incorrectas = []
-            emails_entregas_correctas = []
+            emails_entregas_incorrectas = list()
+            emails_entregas_correctas = list()
         else:
             continuar_en_menu = False
 

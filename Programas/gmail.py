@@ -5,6 +5,7 @@ import time
 import csv
 
 import base64
+from typing import List
 #modulos para la API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -121,14 +122,18 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
     #POST: Retronamos en una lista los id's de los mails.
     
     id_mails = []
-    emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                        q=f'newer: {fecha_actual} label: inbox').execute()
+    try:
+        emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
+                                                            q=f'before: {fecha_actual} label: inbox').execute()
 
-    obteniendo_ids = emails_recibidos['messages']
-    
-    for id in obteniendo_ids:
+        obteniendo_ids = emails_recibidos['messages']
 
-        id_mails.append(id['id'])
+        for id in obteniendo_ids:
+
+            id_mails.append(id['id'])
+
+    except KeyError:
+        print("No hay mensajes de evaluaciones para revisar hoy")
 
     return id_mails
 
@@ -152,6 +157,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
 
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
+    validando_padrones = False
 
     with open(f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", "r") as archivo:
 
@@ -173,7 +179,9 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
 
                 else:                  
                     if k < 16:
-                        print("validando padrones")
+                        if not validando_padrones:
+                            print("validando padrones")
+                            validando_padrones = True
                     else:
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     k+=1
@@ -243,13 +251,16 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
 
 def main(emails_entregas_correctas:list, emails_entregas_incorrectas) -> list:
 
-    fecha = obtener_fecha_actual()    
+    fecha = obtener_fecha_actual()
     servicio = obtener_servicio()
     id_mails = obtener_ids_mails(servicio, fecha)
-    datos_emails = obtener_datos_mails(id_mails, servicio)
-    datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
-                                                      emails_entregas_correctas, emails_entregas_incorrectas)
+    if len(id_mails) == 0:
+        nombres_archivos_adjuntos = []
+    else:
+        datos_emails = obtener_datos_mails(id_mails, servicio)
+        datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails, servicio, 
+                                                        emails_entregas_correctas, emails_entregas_incorrectas)
 
-    nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
+        nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
     return nombres_archivos_adjuntos

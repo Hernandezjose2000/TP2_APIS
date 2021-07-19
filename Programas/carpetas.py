@@ -122,7 +122,19 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                 #print(f"Borrado directorio vacio {carpeta_actual}.")
         except FileNotFoundError:
             pass
-    
+
+
+def verificar_existencia_csv() -> None:
+    alumnos_csv = False
+    docentes_csv = False
+    docentealumnos_csv = False
+
+    while not alumnos_csv or not docentes_csv or not docentealumnos_csv:
+        input(f"Mueva los archivos alumnos.csv, docentes.csv y docente-alumnos.csv a {RUTA_ENTREGAS_ALUMNOS} y presione Enter:  ")
+        alumnos_csv = os.path.exists(f'{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv')
+        docentes_csv = os.path.exists(f'{RUTA_ENTREGAS_ALUMNOS}/docentes.csv')
+        docentealumnos_csv = os.path.exists(f'{RUTA_ENTREGAS_ALUMNOS}/docente-alumnos.csv')
+
 
 def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) -> None:
     # Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente,
@@ -138,6 +150,8 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     for elemento in entregas_alumnos_2:
         entregas_alumnos_3.append(entregas_alumnos_2[elemento])
 
+    verificar_existencia_csv()
+
     datos = {"alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", 
              "docentes.csv":f"{RUTA_ENTREGAS_ALUMNOS}/docentes.csv", 
              "docente-alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/docente-alumnos.csv"}
@@ -149,11 +163,21 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     crear_carpetas_anidadas(nombre_evaluacion, alumnos, entregas_alumnos_3, docentes, dya)
 
 
-def main() -> None:
+def copiar_csv_prueba() -> None:
     # Usamos los .csv de prueba (copia automática al directorio correspondiente)
     
-    datos = [f'{os.getcwd()}/Programas/alumnos.csv', f'{os.getcwd()}/Programas/docentes.csv', f'{os.getcwd()}/Programas/docente-alumnos.csv']
+    ubicacion_csv = os.getcwd()
+    carpeta_actual = os.getcwd().split("\\")[ len(os.getcwd().split("\\")) - 1 ]
 
+    if carpeta_actual == "TP2_APIS":
+        ubicacion_csv = f'{os.getcwd()}/Programas/'
+    elif carpeta_actual == "Programas":
+        ubicacion_csv = f'{os.getcwd()}/'
+    else:
+        ubicacion_csv == f'{Path.home()}/TP2_APIS/Programas'
+
+    datos = [f'{ubicacion_csv}/alumnos.csv', f'{ubicacion_csv}/docentes.csv', f'{ubicacion_csv}/docente-alumnos.csv']
+    
     try:
         os.makedirs(RUTA_ENTREGAS_ALUMNOS)
     except Exception:
@@ -161,6 +185,12 @@ def main() -> None:
     
     for i in range(len(datos)):
         shutil.copy(datos[i], RUTA_ENTREGAS_ALUMNOS)
+    
+    print(f"Se copiaron los .csv de prueba exitosamente a {RUTA_ENTREGAS_ALUMNOS}.")
+
+
+def main() -> None:
+    copiar_csv_prueba()
 
 
 main()
