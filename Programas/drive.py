@@ -166,26 +166,28 @@ def descargar_archivo(servicio):
     POST: 
     '''
     listar_archivos(servicio)
-    fh = io.BytesIO()
-    id_archivo = input('ID del archivo: ')
-    nombre_archivo_descargado = input ('Nombre del archivo: ')
-    request = servicio.files().get_media(fileId=id_archivo)
-    downloader = MediaIoBaseDownload(fh, request, chunksize=204800)
-    done = False 
+    n = int (input('¿Cuántos archivos quiere descagar? '))
+    for i in range (n):
+        fh = io.BytesIO()
+        id_archivo = input('ID del archivo: ')
+        nombre_archivo_descargado = input ('Nombre del archivo: ')
+        request = servicio.files().get_media(fileId=id_archivo)
+        downloader = MediaIoBaseDownload(fh, request, chunksize=204800)
+        done = False 
     
-    try:   
-        while not done:
+        try:   
+            while not done:
                 status, done = downloader.next_chunk()
                 print("Descarga %d%%." % int(status.progress() * 100))
-        fh.seek(0)
-        with open(nombre_archivo_descargado, 'wb') as f:
+            fh.seek(0)
+            with open(nombre_archivo_descargado, 'wb') as f:
                 shutil.copyfileobj(fh, f)
-        print("Archivo descargado con éxito") 
-        return True
+            print("Archivo descargado con éxito") 
+            return True
 
-    except:            
-        print("¡Oh no! Algo salió mal...")
-        return False
+        except:            
+            print("¡Oh no! Algo salió mal...")
+            return False
 
 
 def listar_archivos(servicio:Resource, size = 20) -> None:
@@ -203,6 +205,7 @@ def listar_archivos(servicio:Resource, size = 20) -> None:
         print("Archivos:\n")
         for archivo in archivos:
             if archivo['mimeType'] != "application/vnd.google-apps.folder":
+
                 print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
 
 
@@ -251,7 +254,7 @@ def mover_archivo(servicio:Resource) -> None:
 def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
-    listar_archivos(servicio)
+    descargar_archivo(servicio)
     
 
 
