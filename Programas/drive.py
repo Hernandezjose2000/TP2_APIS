@@ -138,17 +138,25 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
     PRE: Pide el ID de la carpeta en dondr se desean ver los archivos.
     POST: Imprime todos los archivos en esa carpeta.
     '''
+    listar_carpetas(servicio)
     id_carpeta_a_listar = input('Ingrese el ID de la carpeta donde quiera ver los archivos: ')
     query = (f'parents = "{id_carpeta_a_listar}"')
     respuesta = servicio.files().list(q=query).execute()
-    archivos = respuesta.get('files')
+    archivos = respuesta.get('files', [])
     nextPageToken = respuesta.get('nextPageToken')
     
     while nextPageToken:
         response = servicio.files().list(q=query, pageToken=nextPageToken).execute()
         archivos.extend(response.get('files'))
         nextPageToken = response.get('nextPageToken')
-    print (archivos)
+    
+    if not archivos:
+        print('No se encontraron archivos.')
+
+    else:  
+        print("Archivos:\n")
+        for archivo in archivos:  
+               print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} \n".format(archivo['id'], archivo['name'], archivo['mimeType']))
 
 
 def descargar_archivo(servicio:Resource, ruta_archivo_descargado) -> None: #falta pasar a binario!
@@ -237,6 +245,7 @@ def mover_archivo(servicio:Resource) -> None:
 def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
+    listar_archivos_en_carpetas(servicio)
     
 
 
