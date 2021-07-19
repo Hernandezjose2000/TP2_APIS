@@ -1,8 +1,8 @@
-client_secret_drive.json
-client_secret_gmail.json
-token
-token_drive
-Programas/__pycache__
-alumnos.csv
-docente-alumnos.csv
-docentes.csv
+/Documents/algoritmos_y_programacion_1/TP2_APIS/client_secret_drive.json
+/Documents/algoritmos_y_programacion_1/TP2_APIS/client_secret_gmail.json
+/Documents/algoritmos_y_programacion_1/TP2_APIS/token
+/Documents/algoritmos_y_programacion_1/TP2_APIS/token_drive
+/Documents/algoritmos_y_programacion_1/TP2_APIS/Programas/__pycache__
+/Documents/algoritmos_y_programacion_1/TP2_APIS/Programas/alumnos.csv
+/Documents/algoritmos_y_programacion_1/TP2_APIS/Programas/docente-alumnos.csv
+/Documents/algoritmos_y_programacion_1/TP2_APIS/Programas/docentes.csv
