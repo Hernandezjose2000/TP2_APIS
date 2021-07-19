@@ -158,16 +158,7 @@ def menu() -> None:
             else:
                 nombre_evaluacion = input("Como se llama la evaluacion: ")
                 carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
-                #archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
-
-                '''
-                entregaron = nombres_archivos
-                no_entregaron = carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
-
-                if input("¿Desea ver quienes entregaron hasta ahora y quiénes no? (s/n):  ").lower() = "s":
-                    carpetas.mostrar_entregas(entregaron, no_entregaron)
-                '''
-
+                archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
         elif decision == 7:
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 

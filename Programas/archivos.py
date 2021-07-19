@@ -38,11 +38,11 @@ def copiador_de_archivos(archivo_a_copiar:str,archivo_a_reemplazar:str)->None:
             archivo_a_reemplazar.write(archivo_a_copiar)
 
 
-def descompresor(zip:str)->None:
+def descompresor(zip:str) -> None:
         archivo = os.path.basename(zip)
-        print(archivo)
+        #print(archivo)
         archivo_separado = os.path.splitext(archivo)
-        print(archivo_separado)
+        #print(archivo_separado)
         nombre_del_alumno = archivo_separado[0].split("  ")
         print(nombre_del_alumno[1])
 
@@ -52,9 +52,6 @@ def descompresor(zip:str)->None:
                     direccion_final = os.path.join(root, nombre_del_alumno[1])
                     with zipfile.ZipFile(zip, 'r') as zip:
                         zip.extractall(direccion_final)
-        
-      
-        
         
 
 def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
@@ -68,7 +65,9 @@ def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
     return direccion_del_archivo
 
 
-def buscar_y_descomprimir(directorio_de_inicio:str, lista_de_archivos:list)->None:
+def buscar_y_descomprimir(directorio_de_inicio:str, lista_de_archivos:list) -> None:
+    print("\nSe encontraron nuevas entregas de los alumnos:\n")
+
     for archivo in lista_de_archivos:
         archivo = archivo +".zip"
         direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
