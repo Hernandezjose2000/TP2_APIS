@@ -1,32 +1,20 @@
 import csv
 import os
 from pathlib import Path
+import shutil
 
 
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 
-def imprimir_diccionario_simple(diccionario: dict) -> None:
+'''
+def imprimir_diccionario(diccionario: dict) -> None:
     for elemento in diccionario:
         print(f"{elemento}: {diccionario[elemento]}")
 
     print("\n\n")
-
-
-def obtener_evaluaciones(ruta_evaluaciones: str) -> dict:
-    # Recibe csv evaluaciones y genera dict evaluaciones
-    evaluaciones = dict()
-    evaluacion_nombre = 0
-    finalizado = 1
-
-    with open(ruta_evaluaciones, mode='r', encoding="UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv, delimiter= ';')
-        next(csv_reader)
-        for fila in csv_reader:
-            evaluaciones[fila[evaluacion_nombre]] = fila[finalizado]
-
-    return evaluaciones
+'''
 
 
 def obtener_alumnos(ruta_alumnos: str) -> dict:
@@ -120,6 +108,7 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                 except FileExistsError:
                     pass
     
+    # Borramos las carpetas de los docentes cuyos alumnos no hayan entregado nada
     carpetas = os.listdir(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/')
 
     for carpeta in carpetas:
@@ -130,7 +119,7 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                     os.rmdir(carpeta_actual)
                 except FileNotFoundError:
                     pass
-                print(f"Borrado directorio vacio {carpeta_actual}.")
+                #print(f"Borrado directorio vacio {carpeta_actual}.")
         except FileNotFoundError:
             pass
     
@@ -160,10 +149,24 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     crear_carpetas_anidadas(nombre_evaluacion, alumnos, entregas_alumnos_3, docentes, dya)
 
 
+def main() -> None:
+    # Usamos los .csv de prueba (copia automática al directorio correspondiente)
+    
+    datos = [f'{os.getcwd()}/Programas/alumnos.csv', f'{os.getcwd()}/Programas/docentes.csv', f'{os.getcwd()}/Programas/docente-alumnos.csv']
+
+    try:
+        os.makedirs(RUTA_ENTREGAS_ALUMNOS)
+    except Exception:
+        pass
+    
+    for i in range(len(datos)):
+        shutil.copy(datos[i], RUTA_ENTREGAS_ALUMNOS)
+
+
+main()
+
+
 # -----------------------------------------------------------------------------------------------------
-
-
-
 
 
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
