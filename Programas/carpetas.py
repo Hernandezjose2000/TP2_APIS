@@ -87,11 +87,14 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
     for docente in docentes_nombres:
         if docente in dya:
             for alumno in dya[docente]:
-                if alumno in entregas_alumnos:
-                    try:
-                        os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docente}/{alumno}')
-                    except FileExistsError:
-                        pass
+                try:
+                    if alumnos[alumno][0] in entregas_alumnos:
+                        try:
+                            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docente}/{alumnos[alumno][0]} - {alumno}')
+                        except FileExistsError:
+                            pass
+                except KeyError:
+                    pass
     
     # Creamos las carpetas para los alumnos huérfanos (sin docentes)
     alumnos_asignados_aux = list(dya.values())
@@ -102,9 +105,9 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
 
     for alumno in alumnos_nombres:
         if alumno not in alumnos_asignados:
-            if alumno in entregas_alumnos:
+            if alumnos[alumno][0] in entregas_alumnos:
                 try:
-                    os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumno}')
+                    os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumnos[alumno][0]} - {alumno}')
                 except FileExistsError:
                     pass
     
@@ -140,15 +143,11 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     # Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente,
     # además de las entregas de los alumnos
 
-    entregas_alumnos_2 = dict()
-    entregas_alumnos_3 = list()
+    entregas_alumnos_2 = list()
 
     if entregas_alumnos != None:
         for i in range(len(entregas_alumnos)):
-            entregas_alumnos_2[entregas_alumnos[i][0:6:1]] = entregas_alumnos[i][8 : len(entregas_alumnos[i]) : 1]
-
-    for elemento in entregas_alumnos_2:
-        entregas_alumnos_3.append(entregas_alumnos_2[elemento])
+            entregas_alumnos_2.append(entregas_alumnos[i].split("  ")[0])
 
     verificar_existencia_csv()
 
@@ -160,7 +159,7 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     alumnos = obtener_alumnos(datos["alumnos.csv"])
     docentes = obtener_docentes(datos["docentes.csv"])
     dya = obtener_docente_y_alumnos(datos["docente-alumnos.csv"])
-    crear_carpetas_anidadas(nombre_evaluacion, alumnos, entregas_alumnos_3, docentes, dya)
+    crear_carpetas_anidadas(nombre_evaluacion, alumnos, entregas_alumnos_2, docentes, dya)
 
 
 def copiar_csv_prueba() -> None:

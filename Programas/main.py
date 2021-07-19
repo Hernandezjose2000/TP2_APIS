@@ -5,9 +5,9 @@ import archivos
 import carpetas
 #import drive     
 import gmail
+from pathlib import Path
 #import os
 #import time
-from pathlib import Path
 
 
 RUTA_CARPETA = "EVALUACIONES"
@@ -15,72 +15,28 @@ RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
 
 
 '''
-    Python ejecuta los archivos al importarlos, así que hay que colocar los client_secret en la misma carpeta que main.py,
-    o el programa no va a funcar porque no los encuentra
-'''
-
-'''
 def listar_archivos_carpeta_actual() -> None:
-    print("Seleccione donde desea ver sus archivos: ")
-    print("1 - Google Drive")
-    print("2 - Mi PC")
-    print("3 - Atrás")
-
-    opcion = ingresar_opcion_int(3)
-    
-    if opcion == 1:
-        # drive.explorar_archivos()
-        pass
-    elif opcion == 2:
-        # archivos.explorar_archivos()
-        pass
+    pass
 
 
 def crear_archivo() -> None:
-    print("Seleccione donde desea crear un archivo o carpeta: ")
-    print("1 - Google Drive")
-    print("2 - Mi PC")
-    print("3 - Atrás")
-
-    opcion = ingresar_opcion_int(3)
-    
-    if opcion == 1:
-        # drive.crear_archivo()
-        pass
-    elif opcion == 2:
-        # archivos.crear_archivo()
-        pass
+    pass
 
 
 def subir_archivo() -> None:
-    # drive.subir_archivo()
     pass
+
 
 def descargar_archivo() -> None:
-    # drive.descargar_archivo()
     pass
 
+
 def sincronizar() -> None:
-    # carpetas.sincronizar()
     pass
 
 
 def generar_carpetas_evaluacion() -> None:
-    datos = {"evaluaciones.csv":"ruta", "alumnos.csv":"ruta", "docentes.csv":"ruta", "docente-alumnos.csv":"ruta"}
-
-    for nombre in datos:
-        print(f"Buscando el archivo '{nombre}'...")
-        time.sleep(1.5)
-        datos[nombre] = archivos.buscador_de_archivos(os.getcwd(), nombre)
-    
-    print("Se han encontrado todos los archivos.")
-
-    #entregas_alumnos = archivos.buscador_de_carpetas(os.getcwd(), "entregas_alumnos")
-    entregas_alumnos = "/entregas_alumnos"
-
-    carpetas.organizar_evaluaciones(datos, entregas_alumnos)
-
-    print("Se han creado o agregado las carpetas de las evaluaciones exitosamente.")
+    pass
 
 
 def actualizar_entregas_alumnos() -> None:
@@ -88,7 +44,7 @@ def actualizar_entregas_alumnos() -> None:
 '''
 
 
-def validar_decision(decision:int) -> int:
+def validar_decision(decision: int) -> int:
     #PRE: Recibimos como entero la decision del usuario.
     #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
     
@@ -103,7 +59,7 @@ def validar_decision(decision:int) -> int:
     return decision
 
 
-def decision_usuario() ->int:
+def decision_usuario() -> int:
     #PRE: No recibimos ningun parametro
     #POST: Se retorna la decision del usuario como un entero.
 
@@ -151,10 +107,10 @@ def menu() -> None:
             pass
         elif decision == 6:
             nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
+            print(nombres_archivos) #debug
 
             if len(nombres_archivos) == 0:
                 print("Por hoy no tenemos emails de evaluaciones!")
-
             else:
                 nombre_evaluacion = input("Como se llama la evaluacion: ")
                 carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
