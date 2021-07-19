@@ -18,10 +18,10 @@ import base64
 from pathlib import Path
 
 #constantes
-ASUNTO = 20
+PADRON_ASUNTO_EMAIL = 0
+PADRON_ARCHIVO_CSV = 1
 EMAIL = 1
 ARCHIVO_ADJUNTO = 1
-ORIGEN = 17
 ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
 
 RUTA_CARPETA = "EVALUACIONES"
@@ -168,23 +168,21 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
             lineas_archivo_csv.append(linea)               
 
         for id_mail in id_mails:
-            k = 0
+            id_linea_archivo_csv = 0
 
-            while k < 17:
+            while id_linea_archivo_csv < len(lineas_archivo_csv):
 
-                if datos_emails[id_mail]['asunto'][0].strip(" ") in lineas_archivo_csv[k][1]:
+                if datos_emails[id_mail]['asunto'][PADRON_ASUNTO_EMAIL].strip(" ") in lineas_archivo_csv[id_linea_archivo_csv][PADRON_ARCHIVO_CSV]:
                     emails_entregas_correctas.append(datos_emails[id_mail]['origen'])
                     datos_entregas_correctas[id_mail] = {"id_adjunto":datos_emails[id_mail]['adj_id']}
-                    k = 17
+                    id_linea_archivo_csv = 17
 
                 else:                  
-                    if k < 16:
-                        if not validando_padrones:
-                            print("validando padrones")
-                            validando_padrones = True
+                    if id_linea_archivo_csv < len(lineas_archivo_csv) -1:
+                        print("validando padrones")
                     else:
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
-                    k+=1
+                    id_linea_archivo_csv+=1
 
     return datos_entregas_correctas
 

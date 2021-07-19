@@ -106,6 +106,7 @@ def menu() -> None:
         elif decision == 5:
             pass
         elif decision == 6:
+
             nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
             print(nombres_archivos) #debug
 
@@ -115,6 +116,7 @@ def menu() -> None:
                 nombre_evaluacion = input("Como se llama la evaluacion: ")
                 carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
                 archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
+
         elif decision == 7:
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
@@ -125,6 +127,7 @@ def menu() -> None:
                                 
             emails_entregas_incorrectas = list()
             emails_entregas_correctas = list()
+            
         else:
             continuar_en_menu = False
 
