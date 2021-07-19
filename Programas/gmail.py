@@ -101,11 +101,11 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
         lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
 
-        for i in lectura_mail['payload']['headers']:
-            if i['name'] == "From":
-                origen = lectura_mail['payload']['headers'].index(i)
-            if i['name'] == "Subject":
-                asunto = lectura_mail['payload']['headers'].index(i)
+        for header in lectura_mail['payload']['headers']:
+            if header['name'] == "From":
+                origen = lectura_mail['payload']['headers'].index(header)
+            if header['name'] == "Subject":
+                asunto = lectura_mail['payload']['headers'].index(header)
 
         datos_origen = lectura_mail['payload']['headers'][origen]['value'].split("<")
         email_origen = datos_origen[EMAIL].rstrip(">")
