@@ -108,16 +108,17 @@ def menu() -> None:
         elif decision == 6:
 
             nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
-            print(nombres_archivos) #debug
 
             if len(nombres_archivos) == 0:
                 print("Por hoy no tenemos emails de evaluaciones!")
+
             else:
                 nombre_evaluacion = input("Como se llama la evaluacion: ")
                 carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
                 archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
 
         elif decision == 7:
+            
             servicio = gmail.obtener_servicio()
             gmail.enviar_mails(servicio, emails_entregas_incorrectas, "Entrega fallida", 
                                 "Tu padron no se encuentra en nuestra base de datos.")
@@ -127,7 +128,7 @@ def menu() -> None:
                                 
             emails_entregas_incorrectas = list()
             emails_entregas_correctas = list()
-            
+
         else:
             continuar_en_menu = False
 
