@@ -1,5 +1,6 @@
 import os, io
 import os.path
+import shutil
 
  
 from google.oauth2.credentials import Credentials
@@ -159,33 +160,38 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
                print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} \n".format(archivo['id'], archivo['name'], archivo['mimeType']))
 
 
-def descargar_archivo(servicio:Resource, ruta_archivo_descargado) -> None: #falta pasar a binario!
+def descargar_archivo(servicio):
     '''
-    PRE:
+    PRE: 
     POST: 
     '''
     listar_archivos(servicio)
-    n = int (input('¿Cuántos archivos quiere descagar? '))
-    for i in range (n):
-       id_archivo = input('ID del archivo: ')
-       
+    fh = io.BytesIO()
+    id_archivo = input('ID del archivo: ')
+    nombre_archivo_descargado = input ('Nombre del archivo: ')
+    request = servicio.files().get_media(fileId=id_archivo)
+    downloader = MediaIoBaseDownload(fh, request, chunksize=204800)
+    done = False 
     
-       request = servicio.files().get_media(fileId=id_archivo)
-       fh = io.BytesIO()
-       descarga = MediaIoBaseDownload(fh, request)
-       done = False
-       while done is False:
-            status, done = descarga.next_chunk()
-            print("Download %d%%." % int(status.progress() * 100))
-       with io.open(ruta_archivo_descargado,'wb') as f:
-            fh.seek(0)
-            f.write(fh.read())
+    try:   
+        while not done:
+                status, done = downloader.next_chunk()
+                print("Descarga %d%%." % int(status.progress() * 100))
+        fh.seek(0)
+        with open(nombre_archivo_descargado, 'wb') as f:
+                shutil.copyfileobj(fh, f)
+        print("Archivo descargado con éxito") 
+        return True
+
+    except:            
+        print("¡Oh no! Algo salió mal...")
+        return False
 
 
 def listar_archivos(servicio:Resource, size = 20) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
-    POST: Muestra TODOS los archivos en el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
+    POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
     '''
     listar = servicio.files().list(
          pageSize=size,fields="nextPageToken, files(id, name, mimeType, parents)").execute()
@@ -245,8 +251,33 @@ def mover_archivo(servicio:Resource) -> None:
 def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
-    listar_archivos_en_carpetas(servicio)
+    listar_archivos(servicio)
     
 
 
 main()
+
+
+
+
+# def descargar_archivo(servicio:Resource, ruta_archivo_descarga) -> None: #falta pasar a binario!
+#     '''
+#     PRE:
+#     POST: 
+#     '''
+#     listar_archivos(servicio)
+#     n = int (input('¿Cuántos archivos quiere descagar? '))
+#     for i in range (n):
+#        id_archivo = input('ID del archivo: ')
+#        request = servicio.files().get_media(fileId=id_archivo)
+#        fh = io.BytesIO()
+#        descarga = MediaIoBaseDownload(fh, request)
+#        done = False
+
+#        while done is False:
+#             status, done = descarga.next_chunk()
+#             print("Download %d%%." % int(status.progress() * 100))
+
+#        with io.open(ruta_archivo_descarga,'wb') as f:
+#             fh.seek(0)
+#             f.write(fh.read())
