@@ -92,19 +92,19 @@ def subir_archivo(servicio:Resource) -> None:
     PRE: Recibe datos del archivo que se desea subir. 
     POST: Sube el archivo al drive y le muestra al usuario la ID del mismo. No se sube a ninguna carpeta.
     '''
-    print('\nEstos son los tipos de archivo generalmente usados:')
-    for tipo in TIPO_ARCHIVOS:
-        print (tipo)
-
-    nombre_archivo = input('\nIngrese el nombre del archivo junto con su extension (ej - imagen.png): ')
-    tipo_archivo = input ('\nIngrese el tipo de archivo (ej- image/png): ')
+    
+    ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    
     archivo_metadata = {
         "name": nombre_archivo
     }
     
-    subida = MediaFileUpload(nombre_archivo, tipo_archivo, resumable=True)
+    subida = MediaFileUpload(ruta_archivo, resumable=True)
     archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
+
     print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+    
 
 
 
@@ -123,15 +123,17 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
     id_carpeta = carpeta.get("id")
 
     print("\nCarpeta creada con éxito. \n ID Carpeta: ", id_carpeta) 
-    nombre_archivo = input('\nIngrese el nombre del archivo junto con su extension (ej - imagen.png): ')
-
+    ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    
     archivo_metadata = {
         "name": nombre_archivo,
         "parents": [id_carpeta]
     }
     
-    subida = MediaFileUpload(nombre_archivo, resumable=True)
+    subida = MediaFileUpload(ruta_archivo, resumable=True)
     archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
+
     print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
 
 
@@ -319,7 +321,8 @@ def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
     #descargar_archivo(servicio)
-    listar_archivos(servicio)
+
+    subir_archivo_crear_carpeta(servicio)
 
 
 main()
