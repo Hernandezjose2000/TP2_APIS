@@ -195,11 +195,10 @@ def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> No
             mimeMessage["to"] = mail
             mimeMessage["subject"] = asunto  
             mimeMessage.attach(MIMEText(mensaje_email, "plain"))
-            decodificando_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode("UTF-8")
-            print(decodificando_mensaje)
+            codificar_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode("UTF-8")
 
             mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
-                                                        body = {"raw": decodificando_mensaje}).execute()
+                                                        body = {"raw": codificar_mensaje}).execute()
 
             print(f"Mensaje de {asunto} enviado! :)")
 
