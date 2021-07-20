@@ -142,30 +142,30 @@ def descargar_archivo(servicio):
     POST: Descargar el archivo con el nombre deseado
     '''
     listar_archivos(servicio)
-    n = int (input('\n¿Cuántos archivos quiere descagar? '))
+    archivo = input("Ingrese el nombre del archivo que desea descargar:  ")
+    ruta_preferida = input("Ingrese la ruta de descarga:  ")
+    ruta = f'{ruta_preferida}/{archivo}'
+    descargar_archivo_2(servicio, ruta)
 
-    for i in range (n):
-        fh = io.BytesIO()
-        id_archivo = input('\nID del archivo: ')
-        nombre_archivo_descargado = input ('\nNombre con el que desea guardar el archivo: ')
-        request = servicio.files().get_media(fileId=id_archivo)
-        downloader = MediaIoBaseDownload(fh, request, chunksize=204800)
-        done = False 
-    
-        try:   
-            while not done:
-                status, done = downloader.next_chunk()
-                print("\nDescarga %d%%." % int(status.progress() * 100))
-            fh.seek(0)
 
-            with open(nombre_archivo_descargado, 'wb') as f:
-                shutil.copyfileobj(fh, f)
-            print("\nArchivo descargado con éxito") 
-            return True
+def descargar_archivo_2(service, filePath):
+    # Note: The parent folders in filePath must exist
+    fileId = input('\nID del archivo: ')
+    print("-> Downloading file with id: {0} name: {1}".format(fileId, filePath))
+    request = service.files().get_media(fileId=fileId)
+    fh = io.FileIO(filePath, mode='wb')
 
-        except:            
-            print("\n¡Oh no! Algo salió mal...")
-            return False
+    try:
+        downloader = MediaIoBaseDownload(fh, request, chunksize=1024*1024)
+
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk(num_retries = 2)
+            if status:
+                print("Download %d%%." % int(status.progress() * 100))
+        print("Download Complete!")
+    finally:
+        fh.close()
 
 
 def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
@@ -195,8 +195,7 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
                print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} \n".format(archivo['id'], archivo['name'], archivo['mimeType']))
 
 
-
-def listar_archivos(servicio:Resource, size = 20) -> None:
+def listar_archivos(servicio:Resource, size = 8) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
     POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
@@ -311,67 +310,7 @@ def mover_archivo(servicio:Resource) -> None:
 def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
-    subir_archivo(servicio)
-
-    
+    #descargar_archivo(servicio)
 
 
 main()
-
-
-
-
-
-
-#-----Cementerio------
-
-# def descargar_archivo(servicio:Resource, ruta_archivo_descarga) -> None: #falta pasar a binario!
-#     '''
-#     PRE:
-#     POST: 
-#     '''
-#     listar_archivos(servicio)
-#     n = int (input('¿Cuántos archivos quiere descagar? '))
-#     for i in range (n):
-#        id_archivo = input('ID del archivo: ')
-#        request = servicio.files().get_media(fileId=id_archivo)
-#        fh = io.BytesIO()
-#        descarga = MediaIoBaseDownload(fh, request)
-#        done = False
-
-#        while done is False:
-#             status, done = descarga.next_chunk()
-#             print("Download %d%%." % int(status.progress() * 100))
-
-#        with io.open(ruta_archivo_descarga,'wb') as f:
-#             fh.seek(0)
-#             f.write(fh.read())
-
-#def crear_archivo_vacio(servicio:Resource) -> None:
-#     '''
-#     PRE: Pide el nombre del archivo a crear
-#     POST: Crea el archivo en 'Mi Unidad' en Drive. El mismo es vacío, no tiene extensión ni contenido.
-#     '''
-#     nombre_nuevo_archivo = input('Ingrese el nombre del archivo a crear: ')
-#     nuevo_archivo_metadata = {
-#     'name' : nombre_nuevo_archivo,
-#     'mimeType' : 'application/vnd.google-apps.drive-sdk'
-#     }
-#     crear = servicio.files().create(body=nuevo_archivo_metadata, fields='id').execute()
-#     print ('Archivo creado con éxito. \n ID archivo: %s' % crear.get('id'))
-
-
-
-# def crear_carpeta(servicio:Resource) -> None: 
-#     '''
-#     PRE: Recibe datos de la carpeta que se desea crear. 
-#     POST: Crea la carpeta en 'Mi Unidad' en Drive. Muestra la ID de la carpeta
-#     '''
-#     nombre = input('Ingrese nombre de la carpeta a crear: ')
-#     carpeta_metadata = {
-#     'name': nombre,
-#     'mimeType': 'application/vnd.google-apps.folder'
-#     }
-#     file = servicio.files().create(body=carpeta_metadata, fields='id').execute()
-#     print ('Carpeta creada con éxito. \n ID Carpeta: %s' % file.get('id'))
-

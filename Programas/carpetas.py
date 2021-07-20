@@ -8,15 +8,6 @@ RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 
-'''
-def imprimir_diccionario(diccionario: dict) -> None:
-    for elemento in diccionario:
-        print(f"{elemento}: {diccionario[elemento]}")
-
-    print("\n\n")
-'''
-
-
 def obtener_alumnos(ruta_alumnos: str) -> dict:
     # Recibe csv alumnos y genera dict alumnos
     alumnos = dict()
@@ -202,16 +193,4 @@ main()
 ''''
 ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']
 crear_carpetas_evaluaciones(ENTREGAS_ALUMNOS, "Recuperatorio")
-'''
-
-'''
-from pathlib import Path
-home = str(Path.home())
-
-print(home)
-'''
-
-'''
-import time
-time.sleep(16)
 '''

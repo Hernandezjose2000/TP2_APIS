@@ -14,36 +14,6 @@ RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
 
 
-'''
-def listar_archivos_carpeta_actual() -> None:
-    pass
-
-
-def crear_archivo() -> None:
-    pass
-
-
-def subir_archivo() -> None:
-    pass
-
-
-def descargar_archivo() -> None:
-    pass
-
-
-def sincronizar() -> None:
-    pass
-
-
-def generar_carpetas_evaluacion() -> None:
-    pass
-
-
-def actualizar_entregas_alumnos() -> None:
-    pass
-'''
-
-
 def validar_decision(decision: int) -> int:
     #PRE: Recibimos como entero la decision del usuario.
     #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
