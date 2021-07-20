@@ -48,10 +48,15 @@ def descompresor(zip:str) -> None:
 
         for root, directorios, archivos in os.walk(DIRECTORIO_DE_INICIO, topdown=False):
             for carpeta in directorios:
-                if nombre_del_alumno[1] == carpeta:
-                    direccion_final = os.path.join(root, nombre_del_alumno[1])
-                    with zipfile.ZipFile(zip, 'r') as zip:
-                        zip.extractall(direccion_final)
+                if nombre_del_alumno[0] == carpeta.split(" - ")[0]:
+                    direccion_final = os.path.join(root, carpeta)
+
+                    #try agregado como prueba
+                    try:
+                        with zipfile.ZipFile(zip, 'r') as zip:
+                            zip.extractall(direccion_final)
+                    except Exception:
+                        pass
         
 
 def buscador_de_archivos(directorio_de_inicio:str, nombre_del_archivo:str)->str:
