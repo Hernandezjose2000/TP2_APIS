@@ -1,32 +1,24 @@
-#MODULOS PROPIOS DE PYTHON
+#MODULOS LIBRERIA ESTANDAR
 import os
 import datetime
 import time
 import csv
-import time
 import base64
 from typing import List
-#modulos para la API
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
+
+#MODULOS DE TERCEROS PARA LA API
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import base64
-
-from pathlib import Path
 
 #constantes
-PADRON_ASUNTO_EMAIL = 0
-PADRON_ARCHIVO_CSV = 1
-EMAIL = 1
-ARCHIVO_ADJUNTO = 1
 ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
-
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
-
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
@@ -94,7 +86,9 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
     #PRE: Recibimos la lista con los id de los mails que coinciden con la fecha actual.
     #POST: Retornamos un diccionario con los datos que requerimos obtener de estos mails enviados.
 
-    datos_emails = {} #{id de mail:{"asunto":asunto, "origen":origen, "id de archivo adjunto":id_archivo_adjunto}}
+    datos_emails = {}
+    archivo_adjunto = 1
+    email = 1
 
     for id_mail in id_mails:
 
@@ -107,9 +101,9 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
                 asunto = lectura_mail['payload']['headers'].index(header)
 
         datos_origen = lectura_mail['payload']['headers'][origen]['value'].split("<")
-        email_origen = datos_origen[EMAIL].rstrip(">")
+        email_origen = datos_origen[email].rstrip(">")
         asunto = lectura_mail['payload']['headers'][asunto]['value'].split("-")
-        id_archivo_adjunto = lectura_mail['payload']['parts'][ARCHIVO_ADJUNTO]['body']['attachmentId']
+        id_archivo_adjunto = lectura_mail['payload']['parts'][archivo_adjunto]['body']['attachmentId']
         datos_emails[id_mail] = {"asunto":asunto, "origen": email_origen, "adj_id":id_archivo_adjunto}
 
     return datos_emails
@@ -123,7 +117,7 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
     id_mails = []
     try:
         emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                            q=f'label: inbox').execute()
+                                                            q=f'label: inbox has:attachment').execute()
 
         obteniendo_ids = emails_recibidos['messages']
 
@@ -157,6 +151,8 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
     validando_padrones = False
+    padron_asunto_mail = 0
+    padron_archivo_csv = 1
 
     with open(f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", "r") as archivo:
 
@@ -171,7 +167,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
 
             while id_linea_archivo_csv < len(lineas_archivo_csv):
 
-                if datos_emails[id_mail]['asunto'][PADRON_ASUNTO_EMAIL].strip(" ") in lineas_archivo_csv[id_linea_archivo_csv][PADRON_ARCHIVO_CSV]:
+                if datos_emails[id_mail]['asunto'][padron_asunto_mail].strip(" ") in lineas_archivo_csv[id_linea_archivo_csv][padron_archivo_csv]:
                     emails_entregas_correctas.append(datos_emails[id_mail]['origen'])
                     datos_entregas_correctas[id_mail] = {"id_adjunto":datos_emails[id_mail]['adj_id']}
                     id_linea_archivo_csv = 17
@@ -183,7 +179,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
                         if not validando_padrones:
                             print("validando padrones")
                             validando_padrones = True
-                            
+
                     else:
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     id_linea_archivo_csv+=1
