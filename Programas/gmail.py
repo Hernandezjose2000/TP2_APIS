@@ -3,7 +3,7 @@ import os
 import datetime
 import time
 import csv
-
+import time
 import base64
 from typing import List
 #modulos para la API
@@ -88,7 +88,6 @@ def obtener_servicio() -> Resource:
 Todo lo anterior a la variable servicio se encuentra en el archivo conexion_gmail, se debe importar, pero
 estoy teniendo problemas para importarlos, no me reconoce la ruta, lo solucionare.
 '''
-
 
 def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
@@ -177,9 +176,14 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict, servicio:Resource,
                     datos_entregas_correctas[id_mail] = {"id_adjunto":datos_emails[id_mail]['adj_id']}
                     id_linea_archivo_csv = 17
 
-                else:                  
+                else:
+                                 
                     if id_linea_archivo_csv < len(lineas_archivo_csv) -1:
-                        print("validando padrones")
+
+                        if not validando_padrones:
+                            print("validando padrones")
+                            validando_padrones = True
+                            
                     else:
                         emails_entregas_incorrectas.append(datos_emails[id_mail]['origen'])
                     id_linea_archivo_csv+=1
