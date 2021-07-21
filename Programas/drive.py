@@ -83,7 +83,11 @@ TIPO_ARCHIVOS = ['text/x-python-script',
 'text/plain',
 'text/csv',
 'image/png',
-'image/jpeg']
+'image/jpeg',
+'application/pdf',
+'application/vnd.google-apps.file',
+'application/vnd.google-apps.document',
+'application/vnd.google-apps.spreadsheet']
 
 
 
@@ -138,10 +142,10 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
 
 
 
-def descargar_archivo(servicio):
+def descargar_archivo(servicio: Resource) -> None:
     '''
-    PRE: Pregunta cuántos archivos se desea descargar y el nombre con el que se lo desea guardar
-    POST: Descargar el archivo con el nombre deseado
+    PRE: Pregunta los datos del archivo que se desea descargar, entre ellos la ruta.
+    POST: Recibe la funcion de descarga
     '''
     listar_archivos(servicio)
     archivo = input("Ingrese el nombre del archivo que desea descargar:  ")
@@ -151,22 +155,26 @@ def descargar_archivo(servicio):
 
 
 
-def descargar_archivo_2(service, filePath):
-    # Note: The parent folders in filePath must exist
-    fileId = input('\nID del archivo: ')
-    print("-> Downloading file with id: {0} name: {1}".format(fileId, filePath))
-    request = service.files().get_media(fileId=fileId)
+def descargar_archivo_2(servicio: Resource, filePath: None) -> None:
+    '''
+    PRE: ~
+    POST: Descarga el archivo
+    '''
+
+    Id_archivo_descargar = input('\nIngrese el ID del archivo: ')
+    print("\n-> Descargando el archivo - id: {0} nombre: {1}".format(Id_archivo_descargar, filePath))
+    request = servicio.files().get_media(fileId=Id_archivo_descargar)
     fh = io.FileIO(filePath, mode='wb')
 
     try:
-        downloader = MediaIoBaseDownload(fh, request, chunksize=1024*1024)
+        descarga = MediaIoBaseDownload(fh, request, chunksize=1024*1024)
 
-        done = False
-        while done is False:
-            status, done = downloader.next_chunk(num_retries = 2)
+        terminar = False
+        while terminar is False:
+            status, terminar = descarga.next_chunk(num_retries = 2)
             if status:
-                print("Download %d%%." % int(status.progress() * 100))
-        print("Download Complete!")
+                print("Descarga %d%%." % int(status.progress() * 100))
+        print("¡Archivo descargado con éxito!")
     finally:
         fh.close()
 
@@ -200,7 +208,7 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
 
 
 
-def listar_archivos(servicio:Resource, size = 8) -> None:
+def listar_archivos(servicio:Resource, size = 10) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
     POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
@@ -317,12 +325,3 @@ def mover_archivo(servicio:Resource) -> None:
 
 
 
-def main() -> None:
-    servicio = obtener_servicio()
-    #agreguen la funcion que quieran probar
-    #descargar_archivo(servicio)
-
-    subir_archivo_crear_carpeta(servicio)
-
-
-main()
