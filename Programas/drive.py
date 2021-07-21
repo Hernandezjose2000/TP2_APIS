@@ -1,7 +1,5 @@
 import os, io
 import os.path
-import shutil
-
  
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import GOOGLE_API_USE_MTLS_ENDPOINT, build, Resource
@@ -94,19 +92,20 @@ def subir_archivo(servicio:Resource) -> None:
     PRE: Recibe datos del archivo que se desea subir. 
     POST: Sube el archivo al drive y le muestra al usuario la ID del mismo. No se sube a ninguna carpeta.
     '''
-    print('\nEstos son los tipos de archivo generalmente usados:')
-    for tipo in TIPO_ARCHIVOS:
-        print (tipo)
-
-    nombre_archivo = input('\nIngrese el nombre del archivo junto con su extension (ej - imagen.png): ')
-    tipo_archivo = input ('\nIngrese el tipo de archivo (ej- image/png): ')
+    
+    ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    
     archivo_metadata = {
         "name": nombre_archivo
     }
     
-    subida = MediaFileUpload(nombre_archivo, tipo_archivo, resumable=True)
+    subida = MediaFileUpload(ruta_archivo, resumable=True)
     archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
+
     print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+    
+
 
 
 def subir_archivo_crear_carpeta(servicio:Resource) -> None:
@@ -124,16 +123,19 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
     id_carpeta = carpeta.get("id")
 
     print("\nCarpeta creada con éxito. \n ID Carpeta: ", id_carpeta) 
-    nombre_archivo = input('\nIngrese el nombre del archivo junto con su extension (ej - imagen.png): ')
-
+    ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    
     archivo_metadata = {
         "name": nombre_archivo,
         "parents": [id_carpeta]
     }
     
-    subida = MediaFileUpload(nombre_archivo, resumable=True)
+    subida = MediaFileUpload(ruta_archivo, resumable=True)
     archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
+
     print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+
 
 
 def descargar_archivo(servicio):
@@ -146,6 +148,7 @@ def descargar_archivo(servicio):
     ruta_preferida = input("Ingrese la ruta de descarga:  ")
     ruta = f'{ruta_preferida}/{archivo}'
     descargar_archivo_2(servicio, ruta)
+
 
 
 def descargar_archivo_2(service, filePath):
@@ -166,6 +169,7 @@ def descargar_archivo_2(service, filePath):
         print("Download Complete!")
     finally:
         fh.close()
+
 
 
 def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
@@ -192,7 +196,8 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
     else:  
         print("Archivos:\n")
         for archivo in archivos:  
-               print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} \n".format(archivo['id'], archivo['name'], archivo['mimeType']))
+               print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Última Modificaíon: {4} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['modifiedTime']))
+
 
 
 def listar_archivos(servicio:Resource, size = 8) -> None:
@@ -203,7 +208,7 @@ def listar_archivos(servicio:Resource, size = 8) -> None:
 
     listar = servicio.files().list(
              pageSize=size,
-             fields="nextPageToken, files(id, name, mimeType, parents)"
+             fields="nextPageToken, files(id, name, mimeType, parents, modifiedTime)"
              ).execute()
 
     archivos = listar.get('files', [])
@@ -214,7 +219,9 @@ def listar_archivos(servicio:Resource, size = 8) -> None:
         print("\nArchivos:\n")
 
         for archivo in archivos:
-              print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
+              print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} | Última Modificación: {4} \n".format(archivo['id'], archivo['name'], 
+              archivo['mimeType'], archivo['parents'], archivo['modifiedTime']))
+
 
 
 def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
@@ -245,6 +252,7 @@ def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
                     print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
 
 
+
 def listar_carpetas(servicio: Resource, size = 20):
     '''
     PRE: Analiza el tipo de archivo de todos los archivos en el drive
@@ -265,6 +273,7 @@ def listar_carpetas(servicio: Resource, size = 20):
         
     for carpeta in carpetas:
         print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
+
 
 
 def listar (servicio):
@@ -307,10 +316,13 @@ def mover_archivo(servicio:Resource) -> None:
     ).execute()
 
 
+
 def main() -> None:
     servicio = obtener_servicio()
     #agreguen la funcion que quieran probar
     #descargar_archivo(servicio)
+
+    subir_archivo_crear_carpeta(servicio)
 
 
 main()
