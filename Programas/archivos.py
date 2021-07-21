@@ -22,8 +22,7 @@ def verificador_de_archivo_mas_nuevo(archivo_local:str,archivo_drive:str)->None:
         return archivo_mas_nuevo
 
 
-def mover_archivo(direccion_del_archivo_original:str,nombre_del_archivo:str,directorio_de_inicio)->None:
-    #NO FUE TESTEADA TODAVIA
+def mover_archivo(direccion_del_archivo_original:str,nombre_del_archivo:str,directorio_de_inicio:str)->None:
     nuevo_directorio = ("Dar el nuevo directorio: ")
 
     if nuevo_directorio in directorio_de_inicio:
@@ -32,10 +31,13 @@ def mover_archivo(direccion_del_archivo_original:str,nombre_del_archivo:str,dire
 
 
 def copiador_de_archivos(archivo_a_copiar:str,archivo_a_reemplazar:str)->None:
-    #NO FUE TESTEADA tODAVIA
-    with open(archivo_a_copiar,"r"):
-        with open(archivo_a_reemplazar,"w"):
-            archivo_a_reemplazar.write(archivo_a_copiar)
+    try:
+        with open(archivo_a_copiar,"r"):
+            with open(archivo_a_reemplazar,"w"):
+                archivo_a_reemplazar.write(archivo_a_copiar)
+                
+    except:
+        print("No existe el archivo que quiere copiar o reemplazar o no esta en el directorio de Evaluaciones")
 
 
 def descompresor(zip:str) -> None:
@@ -80,33 +82,29 @@ def buscar_y_descomprimir(directorio_de_inicio:str, lista_de_archivos:list) -> N
 
 
 def sincronizacion(direccion:str, directorio_de_inicio:str)->None:
+    direccion_del_archivo_local = ""
+    direccion_del_archivo_drive = ""
     direccion_del_archivo_mas_nuevo = ""
-    no_seguir_descargando = False
     
-    with tempfile.TemporaryDirectory(prefix="Drive-") as tmpdir:
-        
-        while not no_seguir_descargando:
-            #funcion de descargar de drive
-            ans = input("Queres seguir descargando? s/n ")
-            if ans == "n":
-                no_seguir_descargando = True
-        
+    for archivo in direccion:
         with open("archivos_descargados.csv", "w") as archivo_csv:
             escribir = csv.writer(archivo_csv)
             escribir.writerow("Nombre de Archivo")
-            for root, dirs, files in os.walk(tmpdir):
+            for root, dirs, files in os.walk(direccion):
                 for filename in files:
                     escribir.writerow(['', os.path.join(root,filename)])            
-        
-        with open("archivos_descargados.csv", "r") as archivo_csv:
-            archivo_csv.next()
-            for nombre_del_archivo in archivo_csv:
-                direccion_del_archivo_local = buscador_de_archivos(directorio_de_inicio,nombre_del_archivo)
-                direccion_del_archivo_drive = buscador_de_archivos(tmpdir, nombre_del_archivo)
-                direccion_del_archivo_mas_nuevo = verificador_de_archivo_mas_nuevo(direccion_del_archivo_local,direccion_del_archivo_drive)
-        
-        #funcion para sUbir el archivo mas nuevo a drive
-        copiador_de_archivos(direccion_del_archivo_mas_nuevo,direccion_del_archivo_local)
+            
+    with open("archivos_descargados.csv", "r") as archivo_csv:
+        next(archivo_csv)
+        for nombre_del_archivo in archivo_csv:
+            direccion_del_archivo_local = buscador_de_archivos(directorio_de_inicio,nombre_del_archivo)
+            direccion_del_archivo_drive = buscador_de_archivos(direccion, nombre_del_archivo)
+            direccion_del_archivo_mas_nuevo = verificador_de_archivo_mas_nuevo(direccion_del_archivo_local,direccion_del_archivo_drive)
+            
+    copiador_de_archivos(direccion_del_archivo_mas_nuevo,direccion_del_archivo_local)
+    
+    return direccion_del_archivo_mas_nuevo 
+
 
 
 def crear_archivos(directorio_de_guardado:str, directorio_de_inicio:str)->None:
@@ -116,23 +114,25 @@ def crear_archivos(directorio_de_guardado:str, directorio_de_inicio:str)->None:
         print (f"Estos son los tipos de extension validos: {FORMATOS_DE_ARCHIVOS}")
         extension = input("Decime una extension valida: ")
 
-        if extension in FORMATOS_DE_ARCHIVOS:
-            archivo = nombre_del_archivo + extension
-            archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
-            
-            if not archivo_existente  == "":
-                print("Error: Archivo ya existe")
-            
-            else:
-                direccion_del_archivo = os.path.join(directorio_de_guardado, archivo)
-                open(direccion_del_archivo, "x")
-                print("Archivo creado")        
-                mover_archivo = input("Queres mover el archivo? s/n ")
-                if mover_archivo == "s":
-                    mover_archivo(direccion_del_archivo,archivo)
-            seguir_creando =  int(input("1. Crear otro archivo 2. Dejar de Crear"))
-            if seguir_creando == 2:
-                dejar_de_crear_archivos = True
-
-        else:
+        while extension not in FORMATOS_DE_ARCHIVOS:
             print("Error: Extension No Valida")
+            extension = input("Decime una extension valida: ")
+
+        archivo = nombre_del_archivo + extension
+        archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
+            
+        if not archivo_existente  == "":
+            print("Error: Archivo ya existe")
+            
+        else:
+            direccion_del_archivo = os.path.join(directorio_de_guardado, archivo)
+            open(direccion_del_archivo, "x")
+            print("Archivo creado")        
+            mover_archivo = input("Queres mover el archivo? s/n ")
+            if mover_archivo == "s":
+                mover_archivo(direccion_del_archivo,archivo)
+        seguir_creando =  int(input("1. Crear otro archivo 2. Dejar de Crear"))
+        if seguir_creando == 2:
+            dejar_de_crear_archivos = True
+
+        
