@@ -11,7 +11,7 @@ from time import sleep
 import archivos
 import carpetas   
 import gmail
-#import drive 
+import drive 
 
 
 #Ruta por defecto
@@ -27,8 +27,8 @@ def limpiar_pantalla() -> None:
 
 
 def validar_decision(decision: int) -> int:
-    #PRE: Recibimos como entero la decision del usuario.
-    #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
+    '''PRE: Recibimos como entero la decision del usuario.
+    POST: Si pasa la validacion, se retorna el entero introducido por el usuario.'''
     
     numero_fuera_de_rango = True
     while numero_fuera_de_rango:
@@ -42,8 +42,8 @@ def validar_decision(decision: int) -> int:
 
 
 def decision_usuario() -> int:
-    #PRE: No recibimos ningun parametro
-    #POST: Se retorna la decision del usuario como un entero.
+    '''PRE: No recibimos ningun parametro
+    POST: Se retorna la decision del usuario como un entero.'''
 
     valor = False
     while valor == False:
@@ -59,8 +59,8 @@ def decision_usuario() -> int:
 
 
 def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
-    #PRE: --
-    #POST: Carpetas de docentes y alumnos generadas con los archivos de los alumnos dentro.
+    '''PRE: --
+    POST: Carpetas de docentes y alumnos generadas con los archivos de los alumnos dentro.'''
 
     nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
 
@@ -84,8 +84,8 @@ def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas
 
 
 def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
-    #PRE: ---
-    #POST: Mails enviados a los alumnos indicando si la entrega fue correcta o no.
+    '''PRE: ---
+    POST: Mails enviados a los alumnos indicando si la entrega fue correcta o no.'''
 
     servicio = gmail.obtener_servicio()
 
@@ -97,18 +97,21 @@ def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas
 
 
 def menu() -> None:
-    #PRE:Esta funcion no recibe parametros para su ejecucion.
-    #POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.
+    '''PRE:Esta funcion no recibe parametros para su ejecucion.
+    POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.'''
 
+    servicio = drive.obtener_servicio()
     emails_entregas_correctas = list()
     emails_entregas_incorrectas = list()
     continuar_en_menu = True
 
     while continuar_en_menu:
-        print("------------------- SISTEMA DE EVALUACIONES 'GAME OF WHILES' -------------------\n")
+        print("\n------------------- SISTEMA DE EVALUACIONES 'GAME OF WHILES' -------------------\n")
 
         opciones = ["Listar archivos de la carpeta actual","Crear un archivo", 
-                    "Subir un archivo", "Descargar un archivo", "Sincronizar",
+                    "Subir un archivo al Drive", "Descargar un archivo desde Drive","Listar archivos en Drive",
+                    "Mover archivos en Drive",
+                    "Sincronizar local y remoto",
                     "Generar carpetas de una evaluación",
                     "Actualizar entregas de alumnos vía mail",
                     "Salir"]
@@ -120,18 +123,31 @@ def menu() -> None:
         
         if decision == 1:
             pass
-        elif decision == 2:
+
+        elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
             pass
+
         elif decision == 3:
-            pass
+           drive.opcion_subir(servicio)
+
         elif decision == 4:
-            pass
+           drive.descargar_archivo(servicio) #falta binario aun
+  
         elif decision == 5:
-            pass
+            drive.opcion_listar(servicio)
+
         elif decision == 6:
+            drive.mover_archivo(servicio)
+
+        elif decision == 7: #SINCRONIZACION
+            pass    
+
+        elif decision == 8:
             generar_carpetas_evaluacion(emails_entregas_correctas, emails_entregas_incorrectas)
-        elif decision == 7:
+
+        elif decision == 9:
             actualizar_entregas_alumnos(emails_entregas_correctas, emails_entregas_incorrectas)
+
         else:
             continuar_en_menu = False
 
@@ -143,3 +159,4 @@ def main() -> None:
         
 
 main()
+
