@@ -1,17 +1,17 @@
 # TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
 
 
-#Librerias deL sistema
-from pathlib import Path
+#Librerias del sistema
 import os
-#import time
+from pathlib import Path
+from time import sleep
 
 
 #Librerias de la aplicacion
 import archivos
-import carpetas
-#import drive     
+import carpetas   
 import gmail
+#import drive 
 
 
 #Ruta por defecto
@@ -67,15 +67,20 @@ def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas
     if len(nombres_archivos) == 0:
         print("Por hoy no tenemos emails de evaluaciones!")
     else:
-        nombre_evaluacion = input("Introduzca el nombre de la evaluación actual: ")
-        limpiar_pantalla()
-
+        nombre_evaluacion = input("\n>>>>> Introduzca el nombre de la evaluación actual: ")
         carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
-        archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
 
-        print(f"\n\n\nSe descargaron las entregas de los alumnos de la evaluación '{nombre_evaluacion}' exitosamente.")
-        input("\nPresione una tecla para continuar...")
+        print("Descomprimiendo archivos de los alumnos...\n\n")
+        sleep(1.5)
+        archivos.buscar_y_descomprimir(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS', nombres_archivos)
+        print(f"\n\n\n>>>>> Se descargaron las entregas de los alumnos de la evaluación '{nombre_evaluacion}' exitosamente. ")
+
+        entregas = os.path.normpath(f'{RUTA_ENTREGAS_ALUMNOS}\{nombre_evaluacion}')
+        print(f">>>>> Los archivos se encuentran en: {entregas}\n")
+        input("Presione ENTER para continuar ")
+
         limpiar_pantalla()
+        sleep(0.3)
 
 
 def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
