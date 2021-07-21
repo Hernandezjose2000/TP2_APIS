@@ -248,7 +248,7 @@ def copiar_csv_prueba() -> None:
     for i in range(len(datos)):
         shutil.copy(datos[i], RUTA_ENTREGAS_ALUMNOS)
     
-    print(f"Se copiaron los .csv de prueba exitosamente a {RUTA_ENTREGAS_ALUMNOS}.")
+    #print(f"Se copiaron los .csv de prueba exitosamente a {RUTA_ENTREGAS_ALUMNOS}.")
 
 
 def main() -> None:

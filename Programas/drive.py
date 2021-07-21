@@ -229,9 +229,11 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
     else:  
         print("\nArchivos:\n")
         for archivo in archivos:  
+            try:
                print (" \nID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Última Modificaíon: {4} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['modifiedTime']))
                print ('______________________________________________________________________________________________________________________________')
-
+            except Exception:
+                pass
 
 
 def listar_archivos(servicio:Resource, size = 10) -> None:
@@ -253,9 +255,12 @@ def listar_archivos(servicio:Resource, size = 10) -> None:
         print("\nArchivos:\n")
 
         for archivo in archivos:
+            try:
               print ("\n ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} | Última Modificación: {4} \n".format(archivo['id'], archivo['name'], 
               archivo['mimeType'], archivo['parents'], archivo['modifiedTime']))
               print ('______________________________________________________________________________________________________________________________')
+            except Exception:
+                pass
 
 
 
