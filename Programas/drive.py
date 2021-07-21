@@ -232,7 +232,7 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
             print ('_' * 175)
 
 
-def listar_archivos(servicio:Resource, size = 10) -> None:
+def listar_archivos(servicio:Resource, size = 20) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
     POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
