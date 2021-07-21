@@ -99,7 +99,7 @@ def subir_archivo(servicio:Resource) -> None:
     '''
     
     ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
-    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo junto con su extensión: ')
     
     archivo_metadata = {
         "name": nombre_archivo
@@ -169,7 +169,7 @@ def descargar_archivo(servicio: Resource) -> None:
     '''
 
     listar_archivos(servicio)
-    archivo = input("\nIngrese el nombre del archivo que desea descargar:  ")
+    archivo = input("\nIngrese el nombre del archivo que desea descargar junto con su extensión:  ")
     ruta_preferida = input("\nIngrese la ruta de descarga:  ")
     ruta = f'{ruta_preferida}/{archivo}'
     descargar_archivo_2(servicio, ruta)
