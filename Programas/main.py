@@ -1,20 +1,21 @@
-# TRABAJO PRÁCTICO N°2 DE ALGORITMOS Y PROGRAMACIÓN I
-
-
-import archivos
-import carpetas
-#import drive     
-import gmail
+#librerias de python
 from pathlib import Path
 #import os
 #import time
 
+#librerias de la aplicacion
+import archivos
+import carpetas
+#import drive     
+import gmail
 
+#constantes
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}"
 
 
 def validar_decision(decision: int) -> int:
+
     #PRE: Recibimos como entero la decision del usuario.
     #POST: Si pasa la validacion, se retorna el entero introducido por el usuario.
     
@@ -30,6 +31,7 @@ def validar_decision(decision: int) -> int:
 
 
 def decision_usuario() -> int:
+
     #PRE: No recibimos ningun parametro
     #POST: Se retorna la decision del usuario como un entero.
 
@@ -47,6 +49,10 @@ def decision_usuario() -> int:
 
 
 def menu() -> None:
+
+    #PRE:Esta funcion no recibe parametros para su ejecucion.
+    #POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.
+
     emails_entregas_correctas = list()
     emails_entregas_incorrectas = list()
     continuar_en_menu = True
@@ -106,11 +112,7 @@ def menu() -> None:
 
 
 def main() -> None:
-    # ¡Próximamente, más funcionalidades!
+    
     menu()
         
-
 main()
-
-
-# ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']

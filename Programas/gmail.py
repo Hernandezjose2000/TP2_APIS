@@ -137,8 +137,7 @@ def obtener_fecha_actual() -> int:
     return conversion_unix
 
 
-def validar_padron_alumnos(id_mails:list, datos_emails:dict,emails_entregas_correctas:list,
-                            emails_entregas_incorrectas:list) -> dict:
+def validar_padron_alumnos(datos_emails:dict, emails_entregas_correctas:list,emails_entregas_incorrectas:list) -> dict:
 
     #PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
     #POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.
@@ -156,7 +155,7 @@ def validar_padron_alumnos(id_mails:list, datos_emails:dict,emails_entregas_corr
         for linea in lectura_archivo_alumnos:
             lineas_archivo_csv.append(linea)               
 
-        for id_mail in id_mails:
+        for id_mail in datos_emails:
             id_linea_archivo_csv = 0
 
             while id_linea_archivo_csv < len(lineas_archivo_csv):
@@ -246,8 +245,7 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas:list) -> li
         nombres_archivos_adjuntos = []
     else:
         datos_emails = obtener_datos_mails(id_mails, servicio)
-        datos_entregas_correctas = validar_padron_alumnos(id_mails, datos_emails,emails_entregas_correctas, 
-                                                            emails_entregas_incorrectas)
+        datos_entregas_correctas = validar_padron_alumnos(datos_emails,emails_entregas_correctas, emails_entregas_incorrectas)
 
         nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
