@@ -1,5 +1,6 @@
 import os, io
 import os.path
+
  
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import GOOGLE_API_USE_MTLS_ENDPOINT, build, Resource
@@ -117,6 +118,7 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
     PRE: Recibe datos del archivo que se desea subir. Recibe datos de la carpeta a crear.
     POST: Sube el archivo a la nueva carpeta y le muestra al usuario la ID de los mismos. 
     '''
+
     nombre = input('\nIngrese nombre de la carpeta a crear: ')
     carpeta_metadata = {
     'name': nombre,
@@ -142,29 +144,50 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
 
 
 
+def opcion_subir(servicio:Resource) -> None:
+    '''
+    PRE: Le pregunta al usuario dónde desea guardar el archivo a subir.
+    POST: Sube el archivo según la opción elegida.
+    '''
+    print('''\n¿Que desea hacer? 
+    1.Subir archivo a "Mi Unidad"
+    2.Crear una carpeta y subir archivo a la carpeta.
+    ''')
+    opcion = int(input('\nIngrese una opcion: '))
+
+    if opcion == 1:
+        subir_archivo(servicio)
+    elif opcion == 2:
+        subir_archivo_crear_carpeta(servicio)
+
+    
+
 def descargar_archivo(servicio: Resource) -> None:
     '''
     PRE: Pregunta los datos del archivo que se desea descargar, entre ellos la ruta.
-    POST: Recibe la funcion de descarga
+    POST: Recibe la función de descarga.
     '''
+
     listar_archivos(servicio)
-    archivo = input("Ingrese el nombre del archivo que desea descargar:  ")
-    ruta_preferida = input("Ingrese la ruta de descarga:  ")
+    archivo = input("\nIngrese el nombre del archivo que desea descargar:  ")
+    ruta_preferida = input("\nIngrese la ruta de descarga:  ")
     ruta = f'{ruta_preferida}/{archivo}'
     descargar_archivo_2(servicio, ruta)
 
 
 
-def descargar_archivo_2(servicio: Resource, filePath: None) -> None:
+def descargar_archivo_2(servicio: Resource, filePath: str) -> None:
     '''
     PRE: ~
-    POST: Descarga el archivo
+    POST: Descarga el archivo.
     '''
 
     Id_archivo_descargar = input('\nIngrese el ID del archivo: ')
     print("\n-> Descargando el archivo - id: {0} nombre: {1}".format(Id_archivo_descargar, filePath))
+    
     request = servicio.files().get_media(fileId=Id_archivo_descargar)
     fh = io.FileIO(filePath, mode='wb')
+      
 
     try:
         descarga = MediaIoBaseDownload(fh, request, chunksize=1024*1024)
@@ -173,8 +196,9 @@ def descargar_archivo_2(servicio: Resource, filePath: None) -> None:
         while terminar is False:
             status, terminar = descarga.next_chunk(num_retries = 2)
             if status:
-                print("Descarga %d%%." % int(status.progress() * 100))
-        print("¡Archivo descargado con éxito!")
+                print("\nDescarga %d%%." % int(status.progress() * 100))
+        print("\n¡Archivo descargado con éxito!")
+        
     finally:
         fh.close()
 
@@ -185,6 +209,7 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
     PRE: Pide el ID de la carpeta en dondr se desean ver los archivos.
     POST: Imprime todos los archivos en esa carpeta.
     '''
+
     listar_carpetas(servicio)
 
     id_carpeta_a_listar = input('\nIngrese el ID de la carpeta donde quiera ver los archivos: ')
@@ -199,12 +224,13 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
         nextPageToken = response.get('nextPageToken')
     
     if not archivos:
-        print('No se encontraron archivos.')
+        print('\nNo se encontraron archivos.')
 
     else:  
-        print("Archivos:\n")
+        print("\nArchivos:\n")
         for archivo in archivos:  
-               print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Última Modificaíon: {4} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['modifiedTime']))
+               print (" \nID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Última Modificaíon: {4} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['modifiedTime']))
+               print ('______________________________________________________________________________________________________________________________')
 
 
 
@@ -227,8 +253,9 @@ def listar_archivos(servicio:Resource, size = 10) -> None:
         print("\nArchivos:\n")
 
         for archivo in archivos:
-              print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} | Última Modificación: {4} \n".format(archivo['id'], archivo['name'], 
+              print ("\n ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} | Última Modificación: {4} \n".format(archivo['id'], archivo['name'], 
               archivo['mimeType'], archivo['parents'], archivo['modifiedTime']))
+              print ('______________________________________________________________________________________________________________________________')
 
 
 
@@ -237,6 +264,7 @@ def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
     PRE: Busca los archivos en todo el drive segun el tipo de archivo ingresado
     POST: Imprime por pantalla una lista con archivos de ese tipo.
     '''
+
     print('\nEstos son los tipos de archivo generalmente usados:')
     for tipo in TIPO_ARCHIVOS:
         print (tipo)
@@ -258,10 +286,11 @@ def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
 
             if archivo['mimeType'] == mimetype:
                     print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['parents']))
+                   
 
 
 
-def listar_carpetas(servicio: Resource, size = 20):
+def listar_carpetas(servicio: Resource, size = 20) ->None:
     '''
     PRE: Analiza el tipo de archivo de todos los archivos en el drive
     POST: Imprime por pantalla el ID, Nombre y tipo de archivo de las carpetas. 
@@ -284,13 +313,19 @@ def listar_carpetas(servicio: Resource, size = 20):
 
 
 
-def listar (servicio):
+def opcion_listar (servicio:Resource) -> None:
+    '''
+    PRE: Le da al usuario varias opciones para listar y buscar archivos.
+    POST: Segun la opcion, lista archivos/carpetas con diferentes filtros.
+    '''
+
     print('''\n¿Que desea hacer? 
         1.Listar TODOS los archivos y carpetas
         2.Listar carpetas
         3.Listar archivos en una carpeta
         4.Listar archivos según su tipo ''')
     opcion = int(input('\nIngrese una opcion: '))
+
     if opcion == 1:
         listar_archivos(servicio)
     elif opcion == 2:
@@ -304,7 +339,7 @@ def listar (servicio):
 def mover_archivo(servicio:Resource) -> None:
     '''
     PRE: Pide la ID del archivo a mover y la ID de la nueva carpeta contenedora.
-    POST: Mueve el archivo
+    POST: Mueve el archivo.
     '''
     listar_archivos(servicio)
     id_archivo_mover = input('\nIngrese la ID del archivo que desea mover: ')
@@ -312,16 +347,15 @@ def mover_archivo(servicio:Resource) -> None:
     nueva_carpeta_contenedora = input('\nIngrese la ID de la carpte que desea usar: ')
 
     # Localiza la carpeta contenedora y saca el archivo
-    file = servicio.files().get(fileId=id_archivo_mover, fields='parents').execute()
-    previous_parents = ",".join(file.get('parents'))
+    archivo_mover = servicio.files().get(fileId=id_archivo_mover, fields='parents').execute()
+    anterior_directorio = ",".join(archivo_mover.get('parents'))
 
     # Mueve el archivo a la nueva carpeta
-    file = servicio.files().update(
+    archivo_mover = servicio.files().update(
         fileId=id_archivo_mover,
         addParents=nueva_carpeta_contenedora,
-        removeParents=previous_parents,
+        removeParents=anterior_directorio,
         fields=('id, parents')
     ).execute()
-
 
 
