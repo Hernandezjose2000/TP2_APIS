@@ -33,7 +33,7 @@ def validar_decision(decision: int) -> int:
     numero_fuera_de_rango = True
     while numero_fuera_de_rango:
 
-        if decision < 1 or decision > 8:
+        if decision < 1 or decision > 10:
             decision = int(input("Esta introduciendo un valor que no esta en el rango, introduce de vuelta "))
         else:
             numero_fuera_de_rango = False
@@ -110,11 +110,8 @@ def menu() -> None:
 
         opciones = ["Listar archivos de la carpeta actual","Crear un archivo", 
                     "Subir un archivo al Drive", "Descargar un archivo desde Drive","Listar archivos en Drive",
-                    "Mover archivos en Drive",
-                    "Sincronizar local y remoto",
-                    "Generar carpetas de una evaluación",
-                    "Actualizar entregas de alumnos vía mail",
-                    "Salir"]
+                    "Mover archivos en Drive","Sincronizar local y remoto","Generar carpetas de una evaluación",
+                    "Actualizar entregas de alumnos vía mail","Salir"]
 
         for opcion in range(len(opciones)):
             print(f"{opcion + 1}) {opciones[opcion]}")
