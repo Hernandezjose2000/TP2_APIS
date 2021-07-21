@@ -79,8 +79,8 @@ def obtener_servicio() -> Resource:
 
 def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
-    #PRE: Recibimos la lista con los id de los mails que coinciden con la fecha actual.
-    #POST: Retornamos un diccionario con los datos que requerimos obtener de estos mails enviados.
+    '''PRE: Recibimos la lista con los id de los mails que coinciden con la fecha actual.
+    POST: Retornamos un diccionario con los datos que requerimos obtener de estos mails enviados.'''
 
     datos_emails = {}
     archivo_adjunto = 1
@@ -106,8 +106,8 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
 
 def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
 
-    #PRE: No recibimos ningun parametro.
-    #POST: Retronamos en una lista los id's de los mails.
+    '''PRE: No recibimos ningun parametro.
+    POST: Retronamos en una lista los id's de los mails.'''
     
     id_mails = []
 
@@ -128,8 +128,8 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
 
 def obtener_fecha_actual() -> int:
 
-    #PRE: No recibimos nada como argumento.
-    #POST: Retornamos la fecha casteada como int en formato UNIX.
+    '''PRE: No recibimos nada como argumento.
+    POST: Retornamos la fecha casteada como int en formato UNIX.'''
 
     fecha = str(datetime.date.today())
     conversion_unix = int(time.mktime(datetime.datetime.strptime(fecha.replace("-","/"), '%Y/%m/%d').timetuple()))
@@ -139,8 +139,8 @@ def obtener_fecha_actual() -> int:
 
 def validar_padron_alumnos(datos_emails:dict, emails_entregas_correctas:list,emails_entregas_incorrectas:list) -> dict:
 
-    #PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
-    #POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.
+    '''PRE:Recibimos los ids de mails(lista) y datos correspondientes a esos ids de mails(diccionario).
+    POST: Una vez validado el padron se retorna un diccionario con los datos de entregas correctas.'''
 
     lineas_archivo_csv = []
     datos_entregas_correctas = {}
@@ -180,8 +180,8 @@ def validar_padron_alumnos(datos_emails:dict, emails_entregas_correctas:list,ema
 
 def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> None:
 
-    #PRE: Recibimos una lista con los emails de alumnos que tienen una entrega exitosa o fallida.
-    #POST: Se envian los mails correspondientes a esos alumnos.
+    '''PRE: Recibimos una lista con los emails de alumnos que tienen una entrega exitosa o fallida.
+    POST: Se envian los mails correspondientes a esos alumnos.'''
     
     if len(entregas) == 0:
         print(f"\n\nNo hay {asunto} que actualizar via mail") 
@@ -204,8 +204,8 @@ def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> No
 
 def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, datos_emails:dict) -> list:
 
-    #PRE: Recibimos como diccionarios las entregas correctas y los datos de los mails.
-    #POST: Una vez obtenido el archivo adjunto, se retorna el nombre de ls archivos adjuntos como lista.
+    '''PRE: Recibimos como diccionarios las entregas correctas y los datos de los mails.
+    POST: Una vez obtenido el archivo adjunto, se retorna el nombre de ls archivos adjuntos como lista.'''
 
     nombres_archivos_creados = []
     id_mails = []
@@ -236,6 +236,9 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
 
 
 def main(emails_entregas_correctas:list, emails_entregas_incorrectas:list) -> list:
+
+    '''PRE:Se reciben como lista los emails de las entregas correspondientes, en este caso, vacias.
+       POST:Se retornan dichas listas con los emails de las entregas.'''
 
     fecha = obtener_fecha_actual()
     servicio = obtener_servicio()
