@@ -185,12 +185,12 @@ def descargar_archivo_2(servicio: Resource, filePath: str) -> None:
     Id_archivo_descargar = input('\nIngrese el ID del archivo: ')
     print("\n-> Descargando el archivo - id: {0} nombre: {1}".format(Id_archivo_descargar, filePath))
     
-    request = servicio.files().get_media(fileId=Id_archivo_descargar)
+    solicitud = servicio.files().get_media(fileId=Id_archivo_descargar)
     fh = io.FileIO(filePath, mode='wb')
       
 
     try:
-        descarga = MediaIoBaseDownload(fh, request, chunksize=1024*1024)
+        descarga = MediaIoBaseDownload(fh, solicitud, chunksize=1024*1024)
 
         terminar = False
         while terminar is False:
