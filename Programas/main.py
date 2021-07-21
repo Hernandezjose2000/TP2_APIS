@@ -125,10 +125,10 @@ def menu() -> None:
             pass
 
         elif decision == 3:
-           drive.opcion_subir(servicio)
+            drive.opcion_subir(servicio)
 
         elif decision == 4:
-           drive.descargar_archivo(servicio) #falta binario aun
+            drive.descargar_archivo(servicio) #falta binario aun
   
         elif decision == 5:
             drive.opcion_listar(servicio)
