@@ -1,14 +1,24 @@
 import csv
 import os
+from time import sleep
 from pathlib import Path
 import shutil
 
 
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
+CARGANDO = 0.15 #time.sleep()
+
+
+def limpiar_pantalla() -> None:
+    if os.name == "posix":
+        os.system ("clear")
+    elif os.name == "ce" or os.name == "nt" or os.name == "dos":
+        os.system ("cls")
 
 
 def obtener_alumnos(ruta_alumnos: str) -> dict:
+
     '''
     PRE: La ruta tiene que existir
     DESC: Recibe csv alumnos y genera dict alumnos
@@ -19,6 +29,9 @@ def obtener_alumnos(ruta_alumnos: str) -> dict:
     alumno_nombre = 0
     alumno_padron = 1
     alumno_mail = 2
+
+    print("Obteniendo datos de los alumnos...")
+    sleep(CARGANDO)
 
     with open(ruta_alumnos, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
@@ -31,6 +44,7 @@ def obtener_alumnos(ruta_alumnos: str) -> dict:
 
 
 def obtener_docentes(ruta_docentes: str) -> None:
+
     '''
     PRE: La ruta tiene que existir
     DESC: Recibe csv docentes y genera dict docentes
@@ -40,6 +54,9 @@ def obtener_docentes(ruta_docentes: str) -> None:
     docentes = dict()
     docente_nombre = 0
     docente_mail = 1
+
+    print("Obteniendo datos de los docentes...")
+    sleep(CARGANDO)
 
     with open(ruta_docentes, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
@@ -52,6 +69,7 @@ def obtener_docentes(ruta_docentes: str) -> None:
 
 
 def obtener_docente_y_alumnos(ruta_dya: str) -> dict:
+
     '''
     PRE: La ruta tiene que existir
     DESC: Recibe csv docentes-alumnos y genera dict docentes-alumnos (dya)
@@ -60,6 +78,9 @@ def obtener_docente_y_alumnos(ruta_dya: str) -> dict:
 
     dya = dict()
     docentes_agregados = list()
+
+    print("Obteniendo las relaciones docente <- alumnos...")
+    sleep(CARGANDO)
 
     with open(ruta_dya, mode='r', encoding="UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv, delimiter= ';')
@@ -79,6 +100,7 @@ def obtener_docente_y_alumnos(ruta_dya: str) -> dict:
 
 
 def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alumnos: list, docentes: dict, dya: dict) -> None:
+
     '''
     PRE: Nombre de evaluación no nulo
     DESC: Recibe los diccionarios de los csv y crea las carpetas de docentes y alumnos
@@ -88,6 +110,9 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
     docentes_nombres = list(docentes.keys())
     alumnos_nombres = list(alumnos.keys())
 
+    print("Creando las carpetas para los docentes...")
+    sleep(CARGANDO)
+
     # Creamos las carpetas de los docentes
     for i in range(len(docentes_nombres)):
         try:
@@ -95,6 +120,9 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
         except FileExistsError:
             pass
     
+    print("Anidando las carpetas de los alumnos...")
+    sleep(CARGANDO)
+
     # Creamos las subcarpetas de alumnos
     # Si el docente no se encuentra en dya.csv, es porque no tiene un alumno asignado
     for docente in docentes_nombres:
@@ -109,6 +137,9 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
                 except KeyError:
                     pass
     
+    print("Ubicando alumnos sin docentes asignados...")
+    sleep(CARGANDO)
+
     # Creamos las carpetas para los alumnos huérfanos (sin docentes)
     alumnos_asignados_aux = list(dya.values())
     alumnos_asignados = list()
@@ -142,6 +173,7 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
 
 
 def verificar_existencia_csv() -> None:
+
     '''
     PRE: --
     DESC: Comprueba que los archivos .csv con los datos de docentes y alumnos existan, y si no fuerza al usuario a encontrarlos
@@ -155,7 +187,8 @@ def verificar_existencia_csv() -> None:
     # ¿Dejamos al usuario elegir la ubicación de la carpeta de la evaluación? Yo diría que no
 
     while not alumnos_csv or not docentes_csv or not docentealumnos_csv:
-        input(f">>>>> Mueva los archivos alumnos.csv, docentes.csv y docente-alumnos.csv a {RUTA_ENTREGAS_ALUMNOS} y presione Enter:  ")
+        ubicacion_csv = os.path.normpath(f'{RUTA_ENTREGAS_ALUMNOS}')
+        input(f">>>>> Mueva los archivos alumnos.csv, docentes.csv y docente-alumnos.csv a {ubicacion_csv} y presione Enter:  ")
         print("\n")
 
         alumnos_csv = os.path.exists(f'{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv')
@@ -164,12 +197,13 @@ def verificar_existencia_csv() -> None:
 
 
 def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) -> None:
+
     '''
     PRE: Nombre de la evaluación no nulo
     DESC: Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente, además de las entregas de los alumnos
     POST: Carpetas anidadas creadas
     '''
-
+    
     entregas_alumnos_2 = list()
 
     if entregas_alumnos != None:
@@ -177,6 +211,7 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
             entregas_alumnos_2.append(entregas_alumnos[i].split("  ")[0])
 
     verificar_existencia_csv()
+    limpiar_pantalla()
 
     datos = {"alumnos.csv":f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", 
              "docentes.csv":f"{RUTA_ENTREGAS_ALUMNOS}/docentes.csv", 
