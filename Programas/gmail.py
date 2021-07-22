@@ -271,6 +271,7 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas:list) -> li
         datos_emails = obtener_datos_mails(id_mails, servicio)
         marcar_como_leido(servicio, datos_emails)
         datos_entregas_correctas = validar_padron_alumnos(datos_emails,emails_entregas_correctas, emails_entregas_incorrectas)
+        
         if len(datos_entregas_correctas) == 0:
             print("Solo hemos recibido entregas incorrectas")
             nombres_archivos_adjuntos = []
