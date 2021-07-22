@@ -14,6 +14,11 @@ DIRECTORIO_DE_INICIO = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 
 def verificador_de_archivo_mas_nuevo(archivo_local: str, archivo_drive: str) -> None:
+    '''
+        PRE: Direcciones de archivos existentes
+        POSt: La direccion del archivos mas nuevo
+    '''
+    
     archivo_mas_nuevo = ""
     try:
         if filecmp.cmp(archivo_local,archivo_drive,shallow=True) == False:
@@ -35,6 +40,11 @@ def verificador_de_archivo_mas_nuevo(archivo_local: str, archivo_drive: str) -> 
 
 
 def mover_archivo(direccion_del_archivo_original: str, nombre_del_archivo: str, directorio_de_inicio: str) -> None:
+    '''
+        PRE: Direccion original completa, el nombre del archivo para poder dar
+        POSt: Archivo movido al nuevo directorio
+    '''
+
     nuevo_directorio = ("Dar el nuevo directorio: ")
 
     if nuevo_directorio in directorio_de_inicio:
@@ -43,6 +53,10 @@ def mover_archivo(direccion_del_archivo_original: str, nombre_del_archivo: str, 
 
 
 def copiador_de_archivos(archivo_a_copiar: str, archivo_a_reemplazar: str) -> None:
+    '''
+        PRE: Entrega dos direcciones completas de archivos para reemplazar el contenido
+        POSt: Archivo modificado con el vacio
+    '''
     try:
         with open(archivo_a_copiar,"r"):
             with open(archivo_a_reemplazar,"w"):
@@ -53,10 +67,13 @@ def copiador_de_archivos(archivo_a_copiar: str, archivo_a_reemplazar: str) -> No
 
 
 def descompresor(zip: str) -> None:
+        '''
+        PRE: Entrega un direccion completa del archivo a descomprimir
+        POSt: Archivo descomprimido en la carpeta de mismo nombre
+        '''
+        
         archivo = os.path.basename(zip)
-        #print(archivo)
         archivo_separado = os.path.splitext(archivo)
-        #print(archivo_separado)
         nombre_del_alumno = archivo_separado[0].split("  ")
         print("- " + nombre_del_alumno[1])
 
@@ -73,6 +90,11 @@ def descompresor(zip: str) -> None:
         
 
 def buscador_de_archivos(directorio_de_inicio: str, nombre_del_archivo: str) -> str:
+    '''
+        PRE: Nombre del archivo + extension valido para buscar    
+        POSt: LA direccion del archivo que se busca
+    '''
+
     direccion_del_archivo = ""
     
     for root, directorios, archivos in os.walk(directorio_de_inicio, topdown=False):
@@ -84,6 +106,11 @@ def buscador_de_archivos(directorio_de_inicio: str, nombre_del_archivo: str) -> 
 
 
 def buscar_y_descomprimir(directorio_de_inicio: str, lista_de_archivos: list) -> None:
+    '''
+        PRE: Nombre del archivo + extension valido para buscar  
+        POSt: Archivo buscado y descomprimido en su carpeta correspondiente
+    '''
+
     print("\n>>>>> Se encontraron nuevas entregas de los siguientes alumnos:\n")
 
     for archivo in lista_de_archivos:
@@ -93,6 +120,11 @@ def buscar_y_descomprimir(directorio_de_inicio: str, lista_de_archivos: list) ->
 
 
 def sincronizacion(direccion_de_descarga: str, directorio_de_inicio: str) -> None:
+    '''
+        PRE: Direccion completa del archivo descargado
+        POSt: Devuelve la version mas nueva del archivo
+    '''
+
     direccion_del_archivo_local = ""
     direccion_del_archivo_drive = ""
     direccion_del_archivo_mas_nuevo = ""
@@ -118,6 +150,10 @@ def sincronizacion(direccion_de_descarga: str, directorio_de_inicio: str) -> Non
 
 
 def crear_archivos(directorio_de_inicio: str) -> None:
+    '''
+        PRE: - 
+        POSt: Archivo creado con su extension correspondiente
+    '''
 
     try:
         os.makedirs(f"{directorio_de_inicio}/archivos_creados")
