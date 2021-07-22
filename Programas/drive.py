@@ -236,10 +236,10 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
             print ('_' * 175)
 
 
-def listar_archivos(servicio:Resource, size = 20) -> None:
+def listar_archivos(servicio:Resource, size = 100) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
-    POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
+    POST: Muestra hasta 100 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
     '''
 
     listar = servicio.files().list(
@@ -296,7 +296,7 @@ def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
 
 
 
-def listar_carpetas(servicio: Resource, size = 20) ->None:
+def listar_carpetas(servicio: Resource, size = 100) ->None:
     '''
     PRE: Analiza el tipo de archivo de todos los archivos en el drive
     POST: Imprime por pantalla el ID, Nombre y tipo de archivo de las carpetas. 
