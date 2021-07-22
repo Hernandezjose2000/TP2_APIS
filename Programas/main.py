@@ -2,6 +2,7 @@
 
 
 #Librerias del sistema
+from Programas.drive import listar_archivos
 import os
 from pathlib import Path
 from time import sleep
@@ -128,6 +129,7 @@ def menu() -> None:
         
         if decision == 1:
             pass
+            #listar_archivos_carpeta_actual()
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
             pass
@@ -136,7 +138,7 @@ def menu() -> None:
             drive.opcion_subir(servicio)
 
         elif decision == 4:
-            drive.descargar_archivo(servicio) #falta binario aun
+            drive.descargar_archivo(servicio)
   
         elif decision == 5:
             drive.opcion_listar(servicio)

@@ -203,7 +203,7 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     DESC: Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente, además de las entregas de los alumnos
     POST: Carpetas anidadas creadas
     '''
-    print("Hola")
+    
     entregas_alumnos_2 = list()
 
     if entregas_alumnos != None:
