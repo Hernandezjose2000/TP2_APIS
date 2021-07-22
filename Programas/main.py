@@ -4,6 +4,7 @@
 #Librerias del sistema
 import os
 from pathlib import Path
+from posixpath import join
 from time import sleep
 
 
@@ -127,10 +128,44 @@ def menu() -> None:
         decision = decision_usuario()
         
         if decision == 1:
-            pass
+            contenido = list()
+            lista_carpetas = list()
+            directorio = RUTA_ENTREGAS_ALUMNOS
+            terminar =False
+            while not terminar:
+                for root, directorios, contenido in os.walk(directorio, topdown=False):
+                    for carpetas in directorios:
+                        lista_carpetas.append(carpetas)
+                    contenido = (os.listdir(directorio)
+)
+                        
+                if len(lista_carpetas) == 0 and len(contenido) != 0:
+                    print(f"No hay carpetas pero estan los siguientes archivos: {contenido}")
+                    terminar = True
+
+                elif len(contenido) == 0:
+                    print("Esta carpeta esta vacia!")
+                    terminar = True
+
+                else:    
+                    print(f"Estas el contenido de esta carpeta es: {contenido}")
+                    print(f"Las carpetas dentro de esta es: {lista_carpetas}")
+                    seguir_entrando = int(input("1. Seguir entrando en las carpetas 2. Detener el proceso "))
+                    if seguir_entrando == 2:
+                        terminar = True
+                    
+                    else:
+                        carpeta = input("Cual quiere acceder? ")
+                        while not carpeta in directorios:
+                            print("Esa carpeta no existe")
+                            carpeta = input("Cual quiere acceder? ")
+                        lista_carpetas.clear()
+                        directorio_carpeta = os.path.join(directorio,carpeta)
+                        directorio = directorio_carpeta
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
-            pass
+            carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)
+            drive.opcion_subir(servicio)
 
         elif decision == 3:
             drive.opcion_subir(servicio)

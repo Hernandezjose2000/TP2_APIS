@@ -7,9 +7,7 @@ import shutil
 from pathlib import Path
 
 
-RUTA_CARPETA = "EVALUACIONES"
 FORMATOS_DE_ARCHIVOS = [".py",".txt",".csv"]
-DIRECTORIO_DE_INICIO = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 
 def verificador_de_archivo_mas_nuevo(archivo_local: str, archivo_drive: str) -> None:
@@ -44,7 +42,7 @@ def copiador_de_archivos(archivo_a_copiar: str, archivo_a_reemplazar: str) -> No
         print("No existe el archivo que quiere copiar o reemplazar o no esta en el directorio de Evaluaciones")
 
 
-def descompresor(zip: str) -> None:
+def descompresor(zip: str,directorio_de_inicio) -> None:
         archivo = os.path.basename(zip)
         #print(archivo)
         archivo_separado = os.path.splitext(archivo)
@@ -52,7 +50,7 @@ def descompresor(zip: str) -> None:
         nombre_del_alumno = archivo_separado[0].split("  ")
         print("- " + nombre_del_alumno[1])
 
-        for root, directorios, archivos in os.walk(DIRECTORIO_DE_INICIO, topdown=False):
+        for root, directorios, archivos in os.walk(directorio_de_inicio, topdown=False):
             for carpeta in directorios:
                 if nombre_del_alumno[0] == carpeta.split(" - ")[0]:
                     direccion_final = os.path.join(root, carpeta)
@@ -81,7 +79,7 @@ def buscar_y_descomprimir(directorio_de_inicio: str, lista_de_archivos: list) ->
     for archivo in lista_de_archivos:
         archivo = archivo + ".zip"
         direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
-        descompresor(direccion_del_archivo)
+        descompresor(direccion_del_archivo, directorio_de_inicio)
 
 
 def sincronizacion(direccion: str, directorio_de_inicio: str) -> None:
@@ -109,34 +107,35 @@ def sincronizacion(direccion: str, directorio_de_inicio: str) -> None:
     return direccion_del_archivo_mas_nuevo 
 
 
-def crear_archivos(directorio_de_guardado: str, directorio_de_inicio: str) -> None:
+def crear_archivos(directorio_de_inicio: str) -> None:
     dejar_de_crear_archivos = False
-    while not dejar_de_crear_archivos:
-        nombre_del_archivo = input("Decime el nombre del archivo: ")
-        print (f"Estos son los tipos de extension validos: {FORMATOS_DE_ARCHIVOS}")
+
+    try:
+        os.makedirs(f"{directorio_de_inicio}/archivos_creados")
+    except FileExistsError:
+        pass
+
+    nombre_del_archivo = input("Decime el nombre del archivo: ")
+    print (f"Estos son los tipos de extension validos: {FORMATOS_DE_ARCHIVOS}")
+    extension = input("Decime una extension valida: ")
+
+    while extension not in FORMATOS_DE_ARCHIVOS:
+        print("Error: Extension No Valida")
         extension = input("Decime una extension valida: ")
 
-        while extension not in FORMATOS_DE_ARCHIVOS:
-            print("Error: Extension No Valida")
-            extension = input("Decime una extension valida: ")
-
-        archivo = nombre_del_archivo + extension
-        archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
+    archivo = nombre_del_archivo + extension
+    archivo_existente = buscador_de_archivos(directorio_de_inicio,archivo)
             
-        if not archivo_existente  == "":
-            print("Error: Archivo ya existe")
+    if not archivo_existente  == "":
+        print('''Error: Archivo ya existe \nLa direccion del archivo es {archivo_existente}. 
+        (Copie esta direccion para poder subir el archivo al Drive)''')
+        
             
-        else:
-            direccion_del_archivo = os.path.join(directorio_de_guardado, archivo)
-            open(direccion_del_archivo, "x")
-            print("Archivo creado")        
-            mover_archivo = input("Queres mover el archivo? s/n ")
-            if mover_archivo == "s":
-                mover_archivo(direccion_del_archivo,archivo)
-        seguir_creando =  int(input("1. Crear otro archivo 2. Dejar de Crear"))
-        if seguir_creando == 2:
-            dejar_de_crear_archivos = True
-
-
+    else:
+        direccion_del_archivo = os.path.join(f"{directorio_de_inicio}/archivos_creados", archivo)
+        os.path.normpath(directorio_de_inicio)
+        open(direccion_del_archivo, "x")
+        print(f"Archivo creado, direccion: {direccion_del_archivo} \n(Copie esta direccion para poder subir el archivo al Drive)")        
+            
 # (Pala): me arrojaba esto: AttributeError: module 'ntpath' has no attribute 'st_mtime_ns'
         
