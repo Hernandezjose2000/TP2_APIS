@@ -99,7 +99,7 @@ def subir_archivo(servicio:Resource) -> None:
     '''
     
     ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
-    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo: ')
+    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo junto con su extensión: ')
     
     archivo_metadata = {
         "name": nombre_archivo
@@ -169,36 +169,34 @@ def descargar_archivo(servicio: Resource) -> None:
     '''
 
     listar_archivos(servicio)
-    archivo = input("\nIngrese el nombre del archivo que desea descargar:  ")
+    archivo = input("\nIngrese el nombre del archivo que desea descargar junto con su extensión:  ")
     ruta_preferida = input("\nIngrese la ruta de descarga:  ")
     ruta = f'{ruta_preferida}/{archivo}'
     descargar_archivo_2(servicio, ruta)
 
 
 
-def descargar_archivo_2(servicio: Resource, filePath: str) -> None:
+def descargar_archivo_2(servicio: Resource, ruta: str) -> None:
     '''
     PRE: ~
     POST: Descarga el archivo.
     '''
 
     Id_archivo_descargar = input('\nIngrese el ID del archivo: ')
-    print("\n-> Descargando el archivo - id: {0} nombre: {1}".format(Id_archivo_descargar, filePath))
+    print("\n-> Descargando el archivo - id: {0} nombre: {1}".format(Id_archivo_descargar, ruta))
     
-    solicitud = servicio.files().get_media(fileId=Id_archivo_descargar)
-    fh = io.FileIO(filePath, mode='wb')
+    solicitud = servicio.files().get_media(fileId = Id_archivo_descargar)
+    fh = io.FileIO(ruta, mode='wb')
       
-
     try:
-        descarga = MediaIoBaseDownload(fh, solicitud, chunksize=1024*1024)
+        descarga = MediaIoBaseDownload(fh, solicitud, chunksize = 1024*1024)
 
         terminar = False
         while terminar is False:
-            status, terminar = descarga.next_chunk(num_retries = 2)
-            if status:
-                print("\nDescarga %d%%." % int(status.progress() * 100))
-        print("\n¡Archivo descargado con éxito!")
-        
+            estado, terminar = descarga.next_chunk(num_retries = 2)
+            if estado:
+                print("\nDescarga %d%%." % int(estado.progress() * 100))
+        print("\n¡Archivo descargado con éxito!")    
     finally:
         fh.close()
 
@@ -228,13 +226,13 @@ def listar_archivos_en_carpetas(servicio:Resource) -> None: #busquedas anidadas
 
     else:  
         print("\nArchivos:\n")
-        for archivo in archivos:  
-               print (" \nID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Última Modificaíon: {4} \n".format(archivo['id'], archivo['name'], archivo['mimeType'], archivo['modifiedTime']))
-               print ('______________________________________________________________________________________________________________________________')
+
+        for i in range(len(archivos)):  
+            print(f"{archivos[i]['id']}  |  {archivos[i]['name']}  |  {archivos[i]['mimeType']}")
+            print ('_' * 175)
 
 
-
-def listar_archivos(servicio:Resource, size = 10) -> None:
+def listar_archivos(servicio:Resource, size = 20) -> None:
     '''
     PRE: Verifica si hay algun archivo en TODO el drive
     POST: Muestra hasta 20 archivos de todo el Drive, incluso en la papelera. Muestra ID, nombre, tipo de archivo y dónde se encuentra.
@@ -253,9 +251,12 @@ def listar_archivos(servicio:Resource, size = 10) -> None:
         print("\nArchivos:\n")
 
         for archivo in archivos:
+            try:
               print ("\n ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>10} | Carpeta Contenedora: {3} | Última Modificación: {4} \n".format(archivo['id'], archivo['name'], 
               archivo['mimeType'], archivo['parents'], archivo['modifiedTime']))
-              print ('______________________________________________________________________________________________________________________________')
+              print ('_' * 175)
+            except Exception:
+                pass
 
 
 

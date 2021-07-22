@@ -233,7 +233,8 @@ def obtener_archivos_adjuntos(servicio:Resource, datos_entrega_correcta:dict, da
     try:
         os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS')
     except FileExistsError:
-        print("Esta carpeta ya existe!")
+        entregas_alumnos = os.path.normpath(f'{RUTA_ENTREGAS_ALUMNOS}/ENTREGAS_ALUMNOS')
+        print(f"La carpeta {entregas_alumnos} ya existe!")
 
     for id_mail in datos_entrega_correcta:
         id_mails.append(id_mail)

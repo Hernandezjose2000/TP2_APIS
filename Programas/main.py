@@ -129,10 +129,10 @@ def menu() -> None:
             pass
 
         elif decision == 3:
-           drive.opcion_subir(servicio)
+            drive.opcion_subir(servicio)
 
         elif decision == 4:
-           drive.descargar_archivo(servicio) #falta binario aun
+            drive.descargar_archivo(servicio) #falta binario aun
   
         elif decision == 5:
             drive.opcion_listar(servicio)
@@ -145,7 +145,7 @@ def menu() -> None:
 
         elif decision == 8:
             generar_carpetas_evaluacion(emails_entregas_correctas, emails_entregas_incorrectas)
-
+            
         elif decision == 9:
             actualizar_entregas_alumnos(emails_entregas_correctas, emails_entregas_incorrectas)
             emails_entregas_correctas = []
