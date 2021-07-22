@@ -169,7 +169,6 @@ def menu() -> None:
         elif decision == 2:
             limpiar_pantalla()
             carpetas.crear_archivo()
-            pass
 
         elif decision == 3:
             drive.opcion_subir(servicio)
