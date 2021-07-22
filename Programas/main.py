@@ -59,13 +59,15 @@ def decision_usuario() -> int:
 
 
 def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
-    '''PRE: --
-    POST: Carpetas de docentes y alumnos generadas con los archivos de los alumnos dentro.'''
+
+    '''PRE: Recibimos las listas los emails correspondientes.
+    POST: Al usar funciones externas no se retorna ningun dato'''
 
     nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
 
     if len(nombres_archivos) == 0:
         print("Por hoy no tenemos emails de evaluaciones!")
+
     else:
         nombre_evaluacion = input("\n>>>>> Introduzca el nombre de la evaluación actual: ")
         carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
@@ -84,7 +86,8 @@ def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas
 
 
 def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
-    '''PRE: ---
+
+    '''PRE: PRE: Recibimos las listas los emails correspondientes.
     POST: Mails enviados a los alumnos indicando si la entrega fue correcta o no.'''
 
     servicio = gmail.obtener_servicio()
@@ -97,6 +100,7 @@ def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas
 
 
 def menu() -> None:
+
     '''PRE:Esta funcion no recibe parametros para su ejecucion.
     POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.'''
 
@@ -144,7 +148,9 @@ def menu() -> None:
 
         elif decision == 9:
             actualizar_entregas_alumnos(emails_entregas_correctas, emails_entregas_incorrectas)
-
+            emails_entregas_correctas = []
+            emails_entregas_incorrectas = []
+            
         else:
             continuar_en_menu = False
 

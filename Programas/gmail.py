@@ -20,6 +20,7 @@ ARCHIVO_SECRET_CLIENT = 'client_secret_gmail.json'
 RUTA_CARPETA = "EVALUACIONES"
 RUTA_ENTREGAS_ALUMNOS = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 SCOPES = [
+    'https://www.googleapis.com/auth/gmail.modify',
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
 ]
@@ -85,23 +86,37 @@ def obtener_datos_mails(id_mails:list, servicio:Resource) -> dict:
     datos_emails = {}
     archivo_adjunto = 1
     email = 1
-
     for id_mail in id_mails:
-        lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
+        try:
+        
+            lectura_mail = servicio.users().messages().get(userId='evaluaciontp2@gmail.com', id = id_mail).execute()
 
-        for header in lectura_mail['payload']['headers']:
-            if header['name'] == "From":
-                origen = lectura_mail['payload']['headers'].index(header)
-            if header['name'] == "Subject":
-                asunto = lectura_mail['payload']['headers'].index(header)
+            for header in lectura_mail['payload']['headers']:
+                if header['name'] == "From":
+                    origen = lectura_mail['payload']['headers'].index(header)
+                if header['name'] == "Subject":
+                    asunto = lectura_mail['payload']['headers'].index(header)
 
-        datos_origen = lectura_mail['payload']['headers'][origen]['value'].split("<")
-        email_origen = datos_origen[email].rstrip(">")
-        asunto_mail = lectura_mail['payload']['headers'][asunto]['value'].split("-")
-        id_archivo_adjunto = lectura_mail['payload']['parts'][archivo_adjunto]['body']['attachmentId']
-        datos_emails[id_mail] = {"asunto":asunto_mail, "origen": email_origen, "adj_id":id_archivo_adjunto}
+            datos_origen = lectura_mail['payload']['headers'][origen]['value'].split("<")
+            email_origen = datos_origen[email].rstrip(">")
+            asunto_mail = lectura_mail['payload']['headers'][asunto]['value'].split("-")
+            id_archivo_adjunto = lectura_mail['payload']['parts'][archivo_adjunto]['body']['attachmentId']
+            datos_emails[id_mail] = {"asunto":asunto_mail, "origen": email_origen, "adj_id":id_archivo_adjunto}
+
+        except Exception:
+            print("Intenta en unos minutos la opcion 8. Se validaron algunos emails.")
 
     return datos_emails
+
+
+def marcar_como_leido(servicio:Resource, datos_emails:dict) -> None:
+
+    '''PRE:Recibimos los datos de los emails como diccionario cuyas claves son los ids de los mensajes.
+       POST: Al ser un procedimiento no retornamos nada.'''
+
+    for id_mail in datos_emails:
+        conexion = servicio.users().messages().modify(userId='evaluaciontp2@gmail.com', id=id_mail,
+                                                        body={"removeLabelIds":"UNREAD"}).execute()
 
 
 def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
@@ -113,7 +128,7 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
 
     try:
         emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                            q=f'label: inbox has:attachment').execute()
+                                                            q=f'label: inbox has:attachment is:unread').execute()
 
         obteniendo_ids = emails_recibidos['messages']
 
@@ -122,6 +137,8 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
 
     except KeyError:
         print("No hay mensajes de evaluaciones para revisar hoy")
+    except Exception:
+        print("HEMOS TENIDO UNA FALLA DE CONEXION, INTENTE EN UNOS MINUTOS.")
 
     return id_mails
 
@@ -196,8 +213,11 @@ def enviar_mails(servicio:Resource, entregas:list, asunto:str, cuerpo:str) -> No
             mimeMessage.attach(MIMEText(mensaje_email, "plain"))
             codificar_mensaje = base64.urlsafe_b64encode(mimeMessage.as_bytes()).decode("UTF-8")
 
-            mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
+            try:
+                mensaje = servicio.users().messages().send(userId = "evaluaciontp2@gmail.com", 
                                                         body = {"raw": codificar_mensaje}).execute()
+            except Exception:
+                print("Intenta dentro de unos momentos hacer nuevamente la entrega")
 
             print(f"Mensaje de {asunto} enviado! :)")
 
@@ -248,8 +268,8 @@ def main(emails_entregas_correctas:list, emails_entregas_incorrectas:list) -> li
         nombres_archivos_adjuntos = []
     else:
         datos_emails = obtener_datos_mails(id_mails, servicio)
+        marcar_como_leido(servicio, datos_emails)
         datos_entregas_correctas = validar_padron_alumnos(datos_emails,emails_entregas_correctas, emails_entregas_incorrectas)
-
         nombres_archivos_adjuntos = obtener_archivos_adjuntos(servicio, datos_entregas_correctas, datos_emails)
 
     return nombres_archivos_adjuntos
