@@ -2,7 +2,6 @@
 
 
 #Librerias del sistema
-from Programas.drive import listar_archivos
 import os
 from pathlib import Path
 from posixpath import join
@@ -129,8 +128,7 @@ def menu() -> None:
         decision = decision_usuario()
         
         if decision == 1:
-            pass
-            #listar_archivos_carpeta_actual()
+            carpetas.listar_archivos_carpeta_actual()
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
             carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)

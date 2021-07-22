@@ -17,6 +17,85 @@ def limpiar_pantalla() -> None:
         os.system ("cls")
 
 
+def ingresar_opcion(rango_opciones: int) -> int:
+    '''
+    PRE: El rango de opciones tiene que ser un número entero
+    POST: Devuelve una opción representada por un número entero dentro del rango
+    '''
+    opcion = input(">>> Ingrese la opción:   ")
+    while not (opcion.isnumeric() and 0 < int(opcion) <= rango_opciones):
+        if rango_opciones == 1:
+            opcion = input("Pulse 1 >>>   ")
+        else:
+            opcion = input(f"Ingrese una opcion entre 1 y {rango_opciones} >>>   ")
+
+    return int(opcion)
+
+
+def listar_archivos_carpeta_actual() -> None:
+    
+    '''
+    PRE: --
+    DESC: Permite listar todos los archivos que se encuentren en la carpeta actual y en las subcarpetas de la misma tanto a nivel local como remoto
+    POST: --
+    '''
+
+    contenido = list()
+    lista_carpetas = list()
+    directorio = RUTA_ENTREGAS_ALUMNOS
+    seguir = True
+
+    while seguir:
+        directorio_actual = os.path.normpath(directorio)
+
+        for root, directorios, contenido in os.walk(directorio, topdown = False):
+            for carpetas in directorios:
+                lista_carpetas.append(carpetas)
+
+            contenido = os.listdir(directorio)
+                
+        if len(lista_carpetas) == 0 and len(contenido) != 0:
+            print("Archivos en esta carpeta: ")
+            print(contenido)
+            seguir = False
+        elif len(contenido) == 0:
+            print("Esta carpeta esta vacia!")
+            seguir = False
+        else:
+            print(directorio_actual)
+            print(f"{contenido}\n")
+            print("1) Seguir entrando en las carpetas\n2) Volver atrás\n3) Detener el proceso")
+            seguir_entrando = ingresar_opcion(3)
+
+            if seguir_entrando == 1:
+
+                carpeta = input("¿Cuál quiere acceder?")
+
+                while carpeta not in directorios:
+                    print("Esa carpeta no existe")
+                    carpeta = input("Cual quiere acceder? ")
+                    
+                lista_carpetas.clear()
+                directorio_carpeta = os.path.join(directorio, carpeta)
+                directorio = directorio_carpeta
+                
+            elif seguir_entrando == 2:
+
+                regresador = directorio_actual.split('\\')
+                #['C:', 'Users', 'Nestor', 'Desktop', 'EVALUACIONES']
+                regresador.pop(len(regresador) - 1)
+                #['C:', 'Users', 'Nestor', 'Desktop']
+
+                directorio_anterior = str()
+
+                for i in range(len(regresador)):
+                    directorio_anterior += regresador[i] + "\\"
+
+                directorio = directorio_anterior
+            else:
+                seguir = False
+
+
 def obtener_alumnos(ruta_alumnos: str) -> dict:
 
     '''
