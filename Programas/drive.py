@@ -97,18 +97,19 @@ def subir_archivo(servicio:Resource) -> None:
     PRE: Recibe datos del archivo que se desea subir. 
     POST: Sube el archivo al drive y le muestra al usuario la ID del mismo. No se sube a ninguna carpeta.
     '''
-    
-    ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
-    nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo junto con su extensión: ')
-    
-    archivo_metadata = {
-        "name": nombre_archivo
-    }
-    
-    subida = MediaFileUpload(ruta_archivo, resumable=True)
-    archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
+    n = int(input('\nCantidad de archivos que desea subir: '))
+    for i in range (n):  
+        ruta_archivo = input("\nIngrese la ruta del archivo COMPLETA (Agregue el nombre con extension al final):  ")
+        nombre_archivo = input('\nIngrese el nombre con el que desea guardar el archivo junto con su extensión: ')
+        
+        archivo_metadata = {
+            "name": nombre_archivo
+        }
+        
+        subida = MediaFileUpload(ruta_archivo, resumable=True)
+        archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
 
-    print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+        print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
     
 
 
@@ -162,17 +163,20 @@ def opcion_subir(servicio:Resource) -> None:
 
     
 
-def descargar_archivo(servicio: Resource) -> None:
+def descargar_archivo(servicio: Resource) -> None: #ciclo for
     '''
     PRE: Pregunta los datos del archivo que se desea descargar, entre ellos la ruta.
     POST: Recibe la función de descarga.
     '''
+    n_descargar = int(input('\nCantidad de archivos a descargar: '))
+    
+    for i in range ( n_descargar):  
 
-    listar_archivos(servicio)
-    archivo = input("\nIngrese el nombre del archivo que desea descargar junto con su extensión:  ")
-    ruta_preferida = input("\nIngrese la ruta de descarga:  ")
-    ruta = f'{ruta_preferida}/{archivo}'
-    descargar_archivo_2(servicio, ruta)
+        listar_archivos(servicio)
+        archivo = input("\nIngrese el nombre del archivo que desea descargar junto con su extensión:  ")
+        ruta_preferida = input("\nIngrese la ruta de descarga:  ")
+        ruta = f'{ruta_preferida}/{archivo}'
+        descargar_archivo_2(servicio, ruta)
 
 
 
@@ -306,16 +310,17 @@ def listar_carpetas(servicio: Resource, size = 20) ->None:
     carpetas_aux = listar.get('files', [])
     carpetas = list()
 
-    if not carpetas_aux:
-        print ('\nNo se encontraron carpetas')
-    
+    if carpetas_aux:
+         for i in range(len(carpetas_aux)):
+
+              if carpetas_aux[i]['mimeType'] == "application/vnd.google-apps.folder":
+                  carpetas.append(carpetas_aux[i])
+
+                  for i in range(len(carpetas)):
+                      print(f"{carpetas[i]['id']}  |  {carpetas[i]['name']}  |  {carpetas[i]['mimeType']}")
+                      print ('_' * 160)
     else:
-        for i in range(len(carpetas_aux)):
-            if carpetas_aux[i]['mimeType'] == "application/vnd.google-apps.folder":
-                carpetas.append(carpetas_aux[i])
-        
-        for carpeta in carpetas:
-            print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
+         print('\n No se encontraron carpetas.')
 
 
 
@@ -363,5 +368,6 @@ def mover_archivo(servicio:Resource) -> None:
         removeParents=anterior_directorio,
         fields=('id, parents')
     ).execute()
+    print ('\n El archivo se movió con éxito.')
 
 

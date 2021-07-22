@@ -2,8 +2,11 @@
 
 
 #Librerias del sistema
+from Programas.drive import listar_archivos
 import os
 from pathlib import Path
+from posixpath import join
+from tempfile import TemporaryDirectory
 from time import sleep
 
 
@@ -127,15 +130,17 @@ def menu() -> None:
         
         if decision == 1:
             pass
+            #listar_archivos_carpeta_actual()
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
-            pass
+            carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)
+            drive.opcion_subir(servicio)
 
         elif decision == 3:
             drive.opcion_subir(servicio)
 
         elif decision == 4:
-            drive.descargar_archivo(servicio) #falta binario aun
+            drive.descargar_archivo(servicio)
   
         elif decision == 5:
             drive.opcion_listar(servicio)
@@ -144,7 +149,13 @@ def menu() -> None:
             drive.mover_archivo(servicio)
 
         elif decision == 7: #SINCRONIZACION
-            pass    
+            with TemporaryDirectory(prefix="Drive-") as tempdir:
+                print (f"Copie este directorio --> {tempdir}")
+                drive.descargar_archivo(servicio)
+                for archivo in tempdir:
+                    direc_archivo_mas_nuevo = archivos.sincronizacion(tempdir, RUTA_ENTREGAS_ALUMNOS)
+                    print(f"El archivo mas nuevo es {direc_archivo_mas_nuevo}")
+                    drive.opcion_subir(servicio)
 
         elif decision == 8:
             generar_carpetas_evaluacion(emails_entregas_correctas, emails_entregas_incorrectas)
