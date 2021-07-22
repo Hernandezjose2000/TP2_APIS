@@ -15,6 +15,8 @@ DIRECTORIO_DE_INICIO = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 def verificador_de_archivo_mas_nuevo(archivo_local: str, archivo_drive: str) -> None:
         archivo_mas_nuevo = ""
 
+        #if os.path.getmtime(archivo_local) < os.path.getmtime(archivo_drive):, tal vez?
+
         if os.path.st_mtime_ns(archivo_local) < os.path.st_mtime_ns(archivo_drive):
             archivo_mas_nuevo = archivo_local
 
@@ -74,10 +76,10 @@ def buscador_de_archivos(directorio_de_inicio: str, nombre_del_archivo: str) -> 
 
 
 def buscar_y_descomprimir(directorio_de_inicio: str, lista_de_archivos: list) -> None:
-    print("\n>>>>> Se encontraron las entregas de los siguientes alumnos:\n")
+    print("\n>>>>> Se encontraron nuevas entregas de los siguientes alumnos:\n")
 
     for archivo in lista_de_archivos:
-        archivo = archivo +".zip"
+        archivo = archivo + ".zip"
         direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
         descompresor(direccion_del_archivo)
 
@@ -98,9 +100,9 @@ def sincronizacion(direccion: str, directorio_de_inicio: str) -> None:
     with open("archivos_descargados.csv", "r") as archivo_csv:
         next(archivo_csv)
         for nombre_del_archivo in archivo_csv:
-            direccion_del_archivo_local = buscador_de_archivos(directorio_de_inicio,nombre_del_archivo)
+            direccion_del_archivo_local = buscador_de_archivos(directorio_de_inicio, nombre_del_archivo)
             direccion_del_archivo_drive = buscador_de_archivos(direccion, nombre_del_archivo)
-            direccion_del_archivo_mas_nuevo = verificador_de_archivo_mas_nuevo(direccion_del_archivo_local,direccion_del_archivo_drive)
+            direccion_del_archivo_mas_nuevo = verificador_de_archivo_mas_nuevo(direccion_del_archivo_local, direccion_del_archivo_drive)
             
     copiador_de_archivos(direccion_del_archivo_mas_nuevo,direccion_del_archivo_local)
     
@@ -134,4 +136,7 @@ def crear_archivos(directorio_de_guardado: str, directorio_de_inicio: str) -> No
         seguir_creando =  int(input("1. Crear otro archivo 2. Dejar de Crear"))
         if seguir_creando == 2:
             dejar_de_crear_archivos = True
+
+
+# (Pala): me arrojaba esto: AttributeError: module 'ntpath' has no attribute 'st_mtime_ns'
         

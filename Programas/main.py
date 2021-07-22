@@ -101,8 +101,10 @@ def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas
 
 def menu() -> None:
 
-    '''PRE:Esta funcion no recibe parametros para su ejecucion.
-    POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.'''
+    '''
+    PRE: Esta funcion no recibe parametros para su ejecucion.
+    POST: No retornamos nada debido a que todas las accionalidades son funciones externas a esta.
+    '''
 
     servicio = drive.obtener_servicio()
     emails_entregas_correctas = list()
@@ -118,6 +120,8 @@ def menu() -> None:
                     "Actualizar entregas de alumnos vía mail","Salir"]
 
         for opcion in range(len(opciones)):
+            if opcion + 1 < 10:
+                print(" ", end = "")
             print(f"{opcion + 1}) {opciones[opcion]}")
 
         decision = decision_usuario()
@@ -150,7 +154,6 @@ def menu() -> None:
             actualizar_entregas_alumnos(emails_entregas_correctas, emails_entregas_incorrectas)
             emails_entregas_correctas = []
             emails_entregas_incorrectas = []
-            
         else:
             continuar_en_menu = False
 
@@ -162,4 +165,3 @@ def main() -> None:
         
 
 main()
-

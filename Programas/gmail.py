@@ -163,7 +163,7 @@ def validar_padron_alumnos(datos_emails:dict, emails_entregas_correctas:list,ema
     datos_entregas_correctas = {}
     validando_padrones = False
     padron_asunto_mail = 0
-    padron_archivo_csv = 1
+    padron_archivo_csv = 0
 
     with open(f"{RUTA_ENTREGAS_ALUMNOS}/alumnos.csv", "r") as archivo:
         lectura_archivo_alumnos = csv.reader(archivo, delimiter=';')

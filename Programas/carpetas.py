@@ -26,8 +26,8 @@ def obtener_alumnos(ruta_alumnos: str) -> dict:
     '''
 
     alumnos = dict()
-    alumno_nombre = 0
-    alumno_padron = 1
+    alumno_nombre = 1
+    alumno_padron = 0
     alumno_mail = 2
 
     print("Obteniendo datos de los alumnos...")
@@ -38,7 +38,7 @@ def obtener_alumnos(ruta_alumnos: str) -> dict:
         next(csv_reader)
         
         for fila in csv_reader:
-            alumnos[fila[alumno_nombre]] = (fila[alumno_padron], fila[alumno_mail])
+            alumnos[fila[alumno_padron]] = (fila[alumno_nombre], fila[alumno_mail])
     
     return alumnos
 
@@ -108,7 +108,7 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
     '''
 
     docentes_nombres = list(docentes.keys())
-    alumnos_nombres = list(alumnos.keys())
+    alumnos_padrones = list(alumnos.keys())
 
     print("Creando las carpetas para los docentes...")
     sleep(CARGANDO)
@@ -129,9 +129,9 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
         if docente in dya:
             for alumno in dya[docente]:
                 try:
-                    if alumnos[alumno][0] in entregas_alumnos:
+                    if alumno in entregas_alumnos:
                         try:
-                            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docente}/{alumnos[alumno][0]} - {alumno}')
+                            os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/{docente}/{alumno} - {alumnos[alumno][0]}')
                         except FileExistsError:
                             pass
                 except KeyError:
@@ -148,11 +148,11 @@ def crear_carpetas_anidadas(nombre_evaluacion: str, alumnos: dict, entregas_alum
         for j in range(len(alumnos_asignados_aux[i])):
             alumnos_asignados.append(alumnos_asignados_aux[i][j])
 
-    for alumno in alumnos_nombres:
+    for alumno in alumnos_padrones:
         if alumno not in alumnos_asignados:
-            if alumnos[alumno][0] in entregas_alumnos:
+            if alumno in entregas_alumnos:
                 try:
-                    os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumnos[alumno][0]} - {alumno}')
+                    os.makedirs(f'{RUTA_ENTREGAS_ALUMNOS}/{nombre_evaluacion}/(Sin docente asignado)/{alumno} - {alumnos[alumno][0]}')
                 except FileExistsError:
                     pass
     
@@ -203,7 +203,7 @@ def crear_carpetas_evaluaciones(entregas_alumnos: list, nombre_evaluacion: str) 
     DESC: Recibe los csv de los docentes, los alumnos que entregaron y los alumnos asignados a cada docente, además de las entregas de los alumnos
     POST: Carpetas anidadas creadas
     '''
-    
+    print("Hola")
     entregas_alumnos_2 = list()
 
     if entregas_alumnos != None:
@@ -262,7 +262,7 @@ main()
 
 
 # ESTA FUNCIÓN SE LLAMARÁ DESDE main.py
-''''
-ENTREGAS_ALUMNOS = ['107411  Hernandez, Jose', '789456  Villegas, Tomas']
-crear_carpetas_evaluaciones(ENTREGAS_ALUMNOS, "Recuperatorio")
-'''
+
+# ENTREGAS_ALUMNOS = ['108244  Palavecino, Nestor', '847384  Valle, Adrian', '101010  Richardson, Juan']
+# crear_carpetas_evaluaciones(ENTREGAS_ALUMNOS, "Recuperatorio")
+
