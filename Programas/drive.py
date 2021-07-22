@@ -1,5 +1,6 @@
 import os, io
 import os.path
+import carpetas
 
  
 from google.oauth2.credentials import Credentials
@@ -110,6 +111,7 @@ def subir_archivo(servicio:Resource) -> None:
         archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
 
         print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+        input("Presione una tecla para salir:  ")
     
 
 
@@ -142,6 +144,7 @@ def subir_archivo_crear_carpeta(servicio:Resource) -> None:
     archivo = servicio.files().create(body=archivo_metadata, media_body=subida, fields='id').execute()
 
     print("\nArchivo subido con éxito. \n ID Archivo: ", archivo.get("id"))
+    input("Presione una tecla para salir:  ")
 
 
 
@@ -154,7 +157,9 @@ def opcion_subir(servicio:Resource) -> None:
     1.Subir archivo a "Mi Unidad"
     2.Crear una carpeta y subir archivo a la carpeta.
     ''')
-    opcion = int(input('\nIngrese una opcion: '))
+
+    print('\nIngrese una opcion: ')
+    opcion = carpetas.ingresar_opcion(2)
 
     if opcion == 1:
         subir_archivo(servicio)
@@ -345,6 +350,9 @@ def opcion_listar (servicio:Resource) -> None:
         listar_archivos_en_carpetas(servicio)
     elif opcion == 4:
         listar_archivos_segun_tipo(servicio)
+    
+    input("Presione una tecla para salir:  ")
+    carpetas.limpiar_pantalla()
   
 
 def mover_archivo(servicio:Resource) -> None:

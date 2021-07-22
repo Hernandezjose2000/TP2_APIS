@@ -3,6 +3,8 @@ import os
 from time import sleep
 from pathlib import Path
 import shutil
+import archivos
+import drive
 
 
 RUTA_CARPETA = "EVALUACIONES"
@@ -52,7 +54,11 @@ def regresar_directorio_anterior(directorio_actual: str) -> str:
     return directorio_anterior 
 
 
-def explorador_carpetas() -> None:
+def crear_archivo() -> None:
+    explorador_carpetas(True)
+
+
+def explorador_carpetas(crear_archivo: bool = False) -> None:
     
     '''
     PRE: --
@@ -96,8 +102,13 @@ def explorador_carpetas() -> None:
             if contenido_tipo[elemento] == "archivo":
                 print(f"ARCHIVO  :  {elemento}")
 
-        print("-" * 90 + "\n" + "1) Entrar a una carpeta\n2) Subir un nivel\n3) Elegir ruta para navegar\n4) Salir\n")
-        opcion = ingresar_opcion(4)
+        if crear_archivo:
+            print("-" * 90 + "\n")
+            print("1) Entrar a una carpeta\n2) Subir un nivel\n3) Elegir ruta para navegar\n4) Salir\n5) Crear archivo aquí\n6) Subir archivo a Drive")
+            opcion = ingresar_opcion(6)
+        else:
+            print("-" * 90 + "\n" + "1) Entrar a una carpeta\n2) Subir un nivel\n3) Elegir ruta para navegar\n4) Salir\n")
+            opcion = ingresar_opcion(4)
 
         if opcion == 1:
 
@@ -147,8 +158,15 @@ def explorador_carpetas() -> None:
                 directorio_actual = eleccion_2
                 directorio_no_encontrado = False
 
-        else:
+        elif opcion == 4:
             seguir = False
+        elif opcion == 5:
+            if crear_archivo:
+                archivos.crear_archivos(directorio_actual)
+        else:
+            servicio = drive.obtener_servicio()
+            drive.opcion_subir(servicio)
+            pass
         
         limpiar_pantalla()
 
@@ -388,6 +406,8 @@ def copiar_csv_prueba() -> None:
 
 
 def main() -> None:
+    #crear_archivo()
+    #explorador_carpetas()
     copiar_csv_prueba()
     pass
 

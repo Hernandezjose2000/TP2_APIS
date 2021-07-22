@@ -180,6 +180,6 @@ def crear_archivos(directorio_de_inicio: str) -> None:
         direccion_del_archivo = os.path.join(f"{directorio_de_inicio}/archivos_creados", archivo)
         os.path.normpath(directorio_de_inicio)
         open(direccion_del_archivo, "x")
-        print(f"Archivo creado, direccion: {direccion_del_archivo} \n(Copie esta direccion para poder subir el archivo al Drive)")        
+        print(f"Archivo creado, direccion: {os.path.normpath(direccion_del_archivo)} \n(Copie esta direccion para poder subir el archivo al Drive)")        
 
-        
+    input("Presione una tecla para continuar:  ")    

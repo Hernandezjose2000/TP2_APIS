@@ -69,8 +69,11 @@ def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas
     nombres_archivos = gmail.main(emails_entregas_correctas, emails_entregas_incorrectas)
 
     if len(nombres_archivos) != 0:
+        nombre_evaluacion = " "
 
-        nombre_evaluacion = input("\n>>>>> Introduzca el nombre de la evaluación actual: ")
+        while not nombre_evaluacion.isalnum():
+            nombre_evaluacion = input("\n>>>>> Introduzca el nombre de la evaluación actual: ")
+            
         carpetas.crear_carpetas_evaluaciones(nombres_archivos, nombre_evaluacion)
 
         print("Descomprimiendo archivos de los alumnos...\n\n")
@@ -101,6 +104,8 @@ def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas
 
 
 def sincronizar_archivos(servicio: Resource) -> None:
+    # NO ESTÁ TESTEADO
+
     with TemporaryDirectory(prefix="Drive-") as tempdir:
         print (f"Copie este directorio --> {tempdir}")
         drive.descargar_archivo(servicio)
@@ -111,6 +116,13 @@ def sincronizar_archivos(servicio: Resource) -> None:
 
 
 def listar_archivos_carpeta_actual() -> None:
+
+    '''
+    PRE: --
+    DESC: Lista archivos en local o Drive, según escoja el usuario.
+    POST: --
+    '''
+
     print("1) Listar archivos en local\n2) Listar archivos en Drive\n3) Atrás")
     opcion = carpetas.ingresar_opcion(3)
 
@@ -118,9 +130,7 @@ def listar_archivos_carpeta_actual() -> None:
         limpiar_pantalla()
         carpetas.explorador_carpetas()
     elif opcion == 2:
-        #Llamar a la funcionalidad de Drive
-        input("Funcionalidad disponible próximamente. Pulse una tecla para continuar:  ")
-        pass
+        drive.opcion_listar(drive.obtener_servicio())
     else:
         limpiar_pantalla()
 
@@ -156,9 +166,9 @@ def menu() -> None:
         if decision == 1:
             listar_archivos_carpeta_actual()
 
-        elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
-            #carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)
-            #drive.opcion_subir(servicio)
+        elif decision == 2:
+            limpiar_pantalla()
+            carpetas.crear_archivo()
             pass
 
         elif decision == 3:
@@ -173,7 +183,7 @@ def menu() -> None:
         elif decision == 6:
             drive.mover_archivo(servicio)
 
-        elif decision == 7: #SINCRONIZACION
+        elif decision == 7:
             sincronizar_archivos(servicio)
 
         elif decision == 8:
