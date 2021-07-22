@@ -110,6 +110,21 @@ def sincronizar_archivos(servicio: Resource) -> None:
             drive.opcion_subir(servicio)
 
 
+def listar_archivos_carpeta_actual() -> None:
+    print("1) Listar archivos en local\n2) Listar archivos en Drive\n3) Atrás")
+    opcion = carpetas.ingresar_opcion(3)
+
+    if opcion == 1:
+        limpiar_pantalla()
+        carpetas.explorador_carpetas()
+    elif opcion == 2:
+        #Llamar a la funcionalidad de Drive
+        input("Funcionalidad disponible próximamente. Pulse una tecla para continuar:  ")
+        pass
+    else:
+        limpiar_pantalla()
+
+
 def menu() -> None:
 
     '''
@@ -131,6 +146,7 @@ def menu() -> None:
                     "Actualizar entregas de alumnos vía mail","Salir"]
 
         for opcion in range(len(opciones)):
+            sleep(0.03)
             if opcion + 1 < 10:
                 print(" ", end = "")
             print(f"{opcion + 1}) {opciones[opcion]}")
@@ -138,8 +154,7 @@ def menu() -> None:
         decision = decision_usuario()
         
         if decision == 1:
-            limpiar_pantalla()
-            carpetas.explorador_carpetas()
+            listar_archivos_carpeta_actual()
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
             #carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)

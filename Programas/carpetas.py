@@ -56,12 +56,11 @@ def explorador_carpetas() -> None:
     
     '''
     PRE: --
-    DESC: Permite listar todos los archivos que se encuentren en la carpeta actual y en las subcarpetas de la misma tanto a nivel local como remoto
+    DESC: Permite listar todos los archivos y carpetas que se encuentren en el disco (tanto a nivel local como remoto: pronto)
     POST: --
     '''
 
     contenido = list()
-    lista_carpetas = list()
     directorio_actual = os.path.normpath(RUTA_ENTREGAS_ALUMNOS)
     seguir = True
 
@@ -87,7 +86,7 @@ def explorador_carpetas() -> None:
                 contenido_tipo[contenido[i]] = "carpeta"
 
         ajustador_texto = " " * int(((90 - len(directorio_actual)) / 2))
-        print("-" * 90 + "\n" + ajustador_texto + directorio_actual + "\n" + "-" * 90)
+        print("-" * 90 + "\n" + ajustador_texto + os.path.normpath(directorio_actual) + "\n" + "-" * 90)
 
         for elemento in contenido_tipo:
             if contenido_tipo[elemento] == "carpeta":
@@ -97,10 +96,10 @@ def explorador_carpetas() -> None:
             if contenido_tipo[elemento] == "archivo":
                 print(f"ARCHIVO  :  {elemento}")
 
-        print("-" * 90 + "\n" + "1) Entrar a una carpeta\n2) Subir un nivel\n3) Salir\n")
-        seguir_entrando = ingresar_opcion(3)
+        print("-" * 90 + "\n" + "1) Entrar a una carpeta\n2) Subir un nivel\n3) Elegir ruta para navegar\n4) Salir\n")
+        opcion = ingresar_opcion(4)
 
-        if seguir_entrando == 1:
+        if opcion == 1:
 
             carpeta = input("¿A qué carpeta quiere acceder?:  ")
 
@@ -115,7 +114,7 @@ def explorador_carpetas() -> None:
                     input("\nACCESO DENEGADO. Presione una tecla para continuar: ")
                     directorio_actual = regresar_directorio_anterior(directorio_actual)
 
-        elif seguir_entrando == 2:
+        elif opcion == 2:
 
             directorio_no_encontrado = bool()
 
@@ -126,6 +125,26 @@ def explorador_carpetas() -> None:
 
             if not directorio_no_encontrado:
                 directorio_actual = regresar_directorio_anterior(directorio_actual)
+                directorio_no_encontrado = False
+        
+        elif opcion == 3:
+
+            eleccion = input("Ingrese al directorio al cual desea ingresar: ")
+            eleccion_2 = os.path.normpath(eleccion)
+        
+            directorio_no_encontrado = bool()
+
+            try:
+                os.listdir(eleccion_2)
+            except FileNotFoundError:
+                directorio_no_encontrado = True
+                input("No se encontró el directorio solicitado. Pulse una tecla para continuar: ")
+            except PermissionError:
+                directorio_no_encontrado = True
+                input("\nACCESO DENEGADO. Presione una tecla para continuar: ")
+
+            if not directorio_no_encontrado:
+                directorio_actual = eleccion_2
                 directorio_no_encontrado = False
 
         else:
