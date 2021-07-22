@@ -27,3 +27,5 @@ enviar un email con el formato correspondiente cada vez que quiera debuggear el 
 
 2- En el modulo gmail.py, en la funcion obtener_ids_mails, mas especificamente en la linea 131, esta la query formada para extraer los mails, a esta le falta agregarle que traiga los emails
 de la fecha actual. Esto que facilita al corrector? No estar cambiando dicha query dependiendo del dia que lo ejecute el programa.
+
+Todas estas razones se explicaran su por que en la defensa del mismo basandonos en la hipotesis establecidas para estas ocurrencias.
