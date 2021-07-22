@@ -281,6 +281,7 @@ def listar_archivos_segun_tipo(servicio:Resource, size = 20) -> None:
 
     if not archivos:
         print('\nNo se encontraron archivos.')
+        
     else:  
         print("\nArchivos:\n")
         for archivo in archivos:
@@ -304,13 +305,17 @@ def listar_carpetas(servicio: Resource, size = 20) ->None:
 
     carpetas_aux = listar.get('files', [])
     carpetas = list()
+
+    if not carpetas_aux:
+        print ('\nNo se encontraron carpetas')
     
-    for i in range(len(carpetas_aux)):
+    else:
+        for i in range(len(carpetas_aux)):
             if carpetas_aux[i]['mimeType'] == "application/vnd.google-apps.folder":
                 carpetas.append(carpetas_aux[i])
         
-    for carpeta in carpetas:
-        print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
+        for carpeta in carpetas:
+            print (" ID: {0:<20} | Nombre: {1:>5} | Tipo de Archivo: {2:>15} \n".format(carpeta['id'], carpeta['name'], carpeta['mimeType']))
 
 
 
