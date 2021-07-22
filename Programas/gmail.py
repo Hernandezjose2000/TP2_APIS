@@ -127,8 +127,7 @@ def obtener_ids_mails(servicio:Resource, fecha_actual:int) -> list:
     id_mails = []
 
     try:
-        emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', 
-                                                            q=f'label: inbox has:attachment is:unread').execute()
+        emails_recibidos = servicio.users().messages().list(userId='evaluaciontp2@gmail.com', q=f'label: inbox has:attachment is:unread').execute()
 
         obteniendo_ids = emails_recibidos['messages']
 

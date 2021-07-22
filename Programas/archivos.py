@@ -8,7 +8,9 @@ import shutil
 from pathlib import Path
 
 
+RUTA_CARPETA = "EVALUACIONES"
 FORMATOS_DE_ARCHIVOS = [".py",".txt",".csv"]
+DIRECTORIO_DE_INICIO = f"{Path.home()}/Desktop/{RUTA_CARPETA}/"
 
 
 def verificador_de_archivo_mas_nuevo(archivo_local: str, archivo_drive: str) -> None:
@@ -50,13 +52,15 @@ def copiador_de_archivos(archivo_a_copiar: str, archivo_a_reemplazar: str) -> No
         print("Error: No existe el archivo que quiere copiar o reemplazar\n")
 
 
-def descompresor(zip: str,directorio_de_inicio) -> None:
+def descompresor(zip: str) -> None:
         archivo = os.path.basename(zip)
+        #print(archivo)
         archivo_separado = os.path.splitext(archivo)
+        #print(archivo_separado)
         nombre_del_alumno = archivo_separado[0].split("  ")
         print("- " + nombre_del_alumno[1])
 
-        for root, directorios, archivos in os.walk(directorio_de_inicio, topdown=False):
+        for root, directorios, archivos in os.walk(DIRECTORIO_DE_INICIO, topdown=False):
             for carpeta in directorios:
                 if nombre_del_alumno[0] == carpeta.split(" - ")[0]:
                     direccion_final = os.path.join(root, carpeta)
@@ -85,7 +89,7 @@ def buscar_y_descomprimir(directorio_de_inicio: str, lista_de_archivos: list) ->
     for archivo in lista_de_archivos:
         archivo = archivo + ".zip"
         direccion_del_archivo = buscador_de_archivos(directorio_de_inicio, archivo)
-        descompresor(direccion_del_archivo, directorio_de_inicio)
+        descompresor(direccion_del_archivo)
 
 
 def sincronizacion(direccion_de_descarga: str, directorio_de_inicio: str) -> None:

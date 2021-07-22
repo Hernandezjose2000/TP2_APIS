@@ -7,6 +7,7 @@ from pathlib import Path
 from posixpath import join
 from tempfile import TemporaryDirectory
 from time import sleep
+from googleapiclient.discovery import Resource
 
 
 #Librerias de la aplicacion
@@ -85,7 +86,6 @@ def generar_carpetas_evaluacion(emails_entregas_correctas: list, emails_entregas
         sleep(0.3)
 
 
-
 def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas_incorrectas: list) -> None:
 
     '''PRE: PRE: Recibimos las listas los emails correspondientes.
@@ -98,6 +98,16 @@ def actualizar_entregas_alumnos(emails_entregas_correctas: list, emails_entregas
 
     gmail.enviar_mails(servicio, emails_entregas_correctas, "Entrega exitosa", 
                         "Tu entrega se ha recibido exitosamente.")
+
+
+def sincronizar_archivos(servicio: Resource) -> None:
+    with TemporaryDirectory(prefix="Drive-") as tempdir:
+        print (f"Copie este directorio --> {tempdir}")
+        drive.descargar_archivo(servicio)
+        for archivo in tempdir:
+            direc_archivo_mas_nuevo = archivos.sincronizacion(tempdir, RUTA_ENTREGAS_ALUMNOS)
+            print(f"El archivo mas nuevo es {direc_archivo_mas_nuevo}")
+            drive.opcion_subir(servicio)
 
 
 def menu() -> None:
@@ -128,11 +138,13 @@ def menu() -> None:
         decision = decision_usuario()
         
         if decision == 1:
-            carpetas.listar_archivos_carpeta_actual()
+            limpiar_pantalla()
+            carpetas.explorador_carpetas()
 
         elif decision == 2: #preguntar si desea crear en Drive, si la respuesta es si, llama a drive.opcion_subir
-            carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)
-            drive.opcion_subir(servicio)
+            #carpetas.crear_archivos(RUTA_ENTREGAS_ALUMNOS)
+            #drive.opcion_subir(servicio)
+            pass
 
         elif decision == 3:
             drive.opcion_subir(servicio)
@@ -147,13 +159,7 @@ def menu() -> None:
             drive.mover_archivo(servicio)
 
         elif decision == 7: #SINCRONIZACION
-            with TemporaryDirectory(prefix="Drive-") as tempdir:
-                print (f"Copie este directorio --> {tempdir}")
-                drive.descargar_archivo(servicio)
-                for archivo in tempdir:
-                    direc_archivo_mas_nuevo = archivos.sincronizacion(tempdir, RUTA_ENTREGAS_ALUMNOS)
-                    print(f"El archivo mas nuevo es {direc_archivo_mas_nuevo}")
-                    drive.opcion_subir(servicio)
+            sincronizar_archivos(servicio)
 
         elif decision == 8:
             generar_carpetas_evaluacion(emails_entregas_correctas, emails_entregas_incorrectas)

@@ -32,7 +32,27 @@ def ingresar_opcion(rango_opciones: int) -> int:
     return int(opcion)
 
 
-def listar_archivos_carpeta_actual() -> None:
+
+def regresar_directorio_anterior(directorio_actual: str) -> str:
+    regresador = directorio_actual.split('\\')
+    #['C:', 'Users', 'Nestor', 'Desktop', 'EVALUACIONES']
+
+    #['C:', 'Users', 'Nestor', 'TP2_APIS', '']
+    if regresador[ len(regresador) - 1] == "":
+        regresador.pop(len(regresador) - 1)
+    
+    regresador.pop(len(regresador) - 1)
+    #['C:', 'Users', 'Nestor', 'Desktop']
+    
+    directorio_anterior = str()
+
+    for i in range(len(regresador)):
+        directorio_anterior += regresador[i] + "\\"
+
+    return directorio_anterior 
+
+
+def explorador_carpetas() -> None:
     
     '''
     PRE: --
@@ -42,58 +62,76 @@ def listar_archivos_carpeta_actual() -> None:
 
     contenido = list()
     lista_carpetas = list()
-    directorio = RUTA_ENTREGAS_ALUMNOS
+    directorio_actual = os.path.normpath(RUTA_ENTREGAS_ALUMNOS)
     seguir = True
 
     while seguir:
-        directorio_actual = os.path.normpath(directorio)
 
-        for root, directorios, contenido in os.walk(directorio, topdown = False):
-            for carpetas in directorios:
-                lista_carpetas.append(carpetas)
+        try:
+            contenido = os.listdir(directorio_actual)
+        except FileNotFoundError:
+            print(f"No se encontró el directorio {directorio_actual}")
 
-            contenido = os.listdir(directorio)
-                
-        if len(lista_carpetas) == 0 and len(contenido) != 0:
-            print("Archivos en esta carpeta: ")
-            print(contenido)
-            seguir = False
-        elif len(contenido) == 0:
-            print("Esta carpeta esta vacia!")
-            seguir = False
-        else:
-            print(directorio_actual)
-            print(f"{contenido}\n")
-            print("1) Seguir entrando en las carpetas\n2) Volver atrás\n3) Detener el proceso")
-            seguir_entrando = ingresar_opcion(3)
+            directorio_actual = f'{Path.home()}'
+            contenido = os.listdir(directorio_actual)
 
-            if seguir_entrando == 1:
+            print(f"Será redirigido a: {directorio_actual}")
+            input("Presione una tecla para continuar: ")
+            
+        contenido_tipo = dict()
 
-                carpeta = input("¿Cuál quiere acceder?")
-
-                while carpeta not in directorios:
-                    print("Esa carpeta no existe")
-                    carpeta = input("Cual quiere acceder? ")
-                    
-                lista_carpetas.clear()
-                directorio_carpeta = os.path.join(directorio, carpeta)
-                directorio = directorio_carpeta
-                
-            elif seguir_entrando == 2:
-
-                regresador = directorio_actual.split('\\')
-                #['C:', 'Users', 'Nestor', 'Desktop', 'EVALUACIONES']
-                regresador.pop(len(regresador) - 1)
-                #['C:', 'Users', 'Nestor', 'Desktop']
-
-                directorio_anterior = str()
-
-                for i in range(len(regresador)):
-                    directorio_anterior += regresador[i] + "\\"
-
-                directorio = directorio_anterior
+        for i in range(len(contenido)):
+            if "." in contenido[i]:
+                contenido_tipo[contenido[i]] = "archivo"
             else:
-                seguir = False
+                contenido_tipo[contenido[i]] = "carpeta"
+
+        ajustador_texto = " " * int(((90 - len(directorio_actual)) / 2))
+        print("-" * 90 + "\n" + ajustador_texto + directorio_actual + "\n" + "-" * 90)
+
+        for elemento in contenido_tipo:
+            if contenido_tipo[elemento] == "carpeta":
+                print(f"CARPETA  \  {elemento}")
+
+        for elemento in contenido_tipo:
+            if contenido_tipo[elemento] == "archivo":
+                print(f"ARCHIVO  :  {elemento}")
+
+        print("-" * 90 + "\n" + "1) Entrar a una carpeta\n2) Subir un nivel\n3) Salir\n")
+        seguir_entrando = ingresar_opcion(3)
+
+        if seguir_entrando == 1:
+
+            carpeta = input("¿A qué carpeta quiere acceder?:  ")
+
+            if carpeta not in contenido or contenido_tipo[carpeta] == "archivo":
+                input("Esa carpeta no existe. Presione una tecla para continuar:  ")
+            else:
+                directorio_actual = os.path.join(directorio_actual, carpeta)
+
+                try:
+                    contenido = os.listdir(directorio_actual)
+                except PermissionError:
+                    input("\nACCESO DENEGADO. Presione una tecla para continuar: ")
+                    directorio_actual = regresar_directorio_anterior(directorio_actual)
+
+        elif seguir_entrando == 2:
+
+            directorio_no_encontrado = bool()
+
+            try:
+                os.listdir(regresar_directorio_anterior(directorio_actual))
+            except FileNotFoundError:
+                directorio_no_encontrado = True
+
+            if not directorio_no_encontrado:
+                directorio_actual = regresar_directorio_anterior(directorio_actual)
+                directorio_no_encontrado = False
+
+        else:
+            seguir = False
+        
+        limpiar_pantalla()
 
 
 def obtener_alumnos(ruta_alumnos: str) -> dict:
@@ -332,6 +370,7 @@ def copiar_csv_prueba() -> None:
 
 def main() -> None:
     copiar_csv_prueba()
+    pass
 
 
 main()
